@@ -87,6 +87,7 @@ export default function CompanyManagement() {
         }
 
     }
+    
     const fetchCompanies = async (filterData: any) => {
         if (!token) return;
         try {
