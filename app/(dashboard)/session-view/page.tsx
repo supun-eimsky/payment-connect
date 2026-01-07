@@ -376,8 +376,8 @@ export default function TripsPage() {
                                                                     <CardContent className="p-0">
                                                                         <p className="text-lg opacity-90">Total Revenue</p>
                                                                         <div className="grid grid-cols-3 gap-0 text-center">
-                                                                            <div className="grid grid-cols-1 gap-0 text-center text-base"><span>Cash</span><span className='font-bold' >Rs.{selectedTrip.metrics.cash_revenue}</span></div>
-                                                                            <div className="grid grid-cols-1 gap-0 text-center text-base"><span>Card</span><span className='font-bold'>Rs.{selectedTrip.metrics.card_revenue}</span></div>
+                                                                            <div className="grid grid-cols-1 gap-0 text-center text-base"><span>Cash</span><span className='font-bold' >Rs.{selectedTrip.metrics.cash_revenue.toLocaleString()}</span></div>
+                                                                            <div className="grid grid-cols-1 gap-0 text-center text-base"><span>Card</span><span className='font-bold'>Rs.{selectedTrip.metrics.card_revenue.toLocaleString()}</span></div>
                                                                             <div className="grid grid-cols-1 gap-0 text-cente text-base"><span>QR</span><span className='font-bold'>Rs.0</span></div>
                                                                         </div>
                                                                     </CardContent>
@@ -489,7 +489,7 @@ export default function TripsPage() {
                                                                         <div className="grid grid-cols-4 gap-4 mb-4">
                                                                             <div className="bg-[#EDEDED] h-[55px] rounded-lg text-center py-1">
                                                                                 <div className="text-[15px] text-gray-700">Total Revenue</div>
-                                                                                <div className="text-lg font-bold">Rs.{session.total_revenue}</div>
+                                                                                <div className="text-lg font-bold">Rs.{session.total_revenue.toLocaleString()}</div>
                                                                             </div>
                                                                             <div className="bg-[#EDEDED] h-[55px] rounded-lg text-center py-1">
                                                                                 <div className="text-[15px] text-gray-700">Total Tickets</div>

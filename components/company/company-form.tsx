@@ -131,7 +131,7 @@ export default function CompanyForm({
                   onValueChange={(value) => handleChange('organisation_id', value)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Company" />
+                    <SelectValue placeholder="Select Organisation" />
                   </SelectTrigger>
                   <SelectContent>
                     {organisations?.map((item, index) => (

@@ -110,7 +110,7 @@ export default function DeviceForm({
     <div className="px-1 lg:px-3">
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">{initialData ? 'Edit Route Permit' : 'Add New Route Permit '}</CardTitle>
+          <CardTitle className="text-lg">{initialData ? 'Edit Devices ' : 'Add New Devices  '}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">

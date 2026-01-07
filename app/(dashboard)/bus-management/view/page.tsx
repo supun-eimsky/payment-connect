@@ -1039,9 +1039,11 @@ const BusDetailsView: React.FC = () => {
                                                                         <SelectValue placeholder="Select a devices" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        {availableDevices.map((user) => (
+                                                                        {availableDevices.length >0?(<>{availableDevices.map((user) => (
                                                                             <SelectItem key={user.id} value={user.id}>{user.device_code} ({user.model})</SelectItem>
-                                                                        ))}
+                                                                        ))}</>):(<>{
+                                                                            <SelectItem key="notFound" value="notfound" disabled>Not Found</SelectItem>}</>)}
+                                                                        
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>
@@ -1257,7 +1259,7 @@ const BusDetailsView: React.FC = () => {
                                                 <SelectContent>
                                                     <SelectItem value="active">Active</SelectItem>
                                                     <SelectItem value="inactive">Inactive</SelectItem>
-                                                    <SelectItem value="suspended">Suspended</SelectItem>
+                                                    
                                                 </SelectContent>
                                             </Select>
                                         </div>
