@@ -68,14 +68,14 @@ export default function BusManagement() {
         try {
 
             // Call with filter
-            console.log(filterData, "sssssssssssssssssssjkjlj")
+            //console.log(filterData, "sssssssssssssssssssjkjlj")
             const data = await apiService.getRouteWithFilters(token, null, filterData);
             const busesArray = data.routes;
 
             setRouteList(busesArray)
             // setAvailableRoutes(busesArray)
             //  setRoutePermits(busesArray);
-            console.log('Route  dsssssss:', busesArray);
+          //  console.log('Route  dsssssss:', busesArray);
         } catch (err) {
             console.error('Route  d', err);
         } finally {
@@ -92,7 +92,7 @@ export default function BusManagement() {
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setcompanies(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+          //  console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -111,7 +111,7 @@ export default function BusManagement() {
             const busesArray = data || [];
             setRoutePermits(busesArray.data);
             pagination.setTotal(busesArray.total);
-            console.log('Route Permits ds:', busesArray);
+            //console.log('Route Permits ds:', busesArray);
         } catch (err) {
             console.error('Route Permits d', err);
         } finally {
@@ -138,7 +138,7 @@ export default function BusManagement() {
     };
 
     const handleEdit = (bus: RoutePermit) => {
-        console.log(bus)
+      //  console.log(bus)
 
 
         setEditingRoutePermit(bus);
@@ -149,7 +149,7 @@ export default function BusManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+       // console.log(bus)
         setSelectedItem(bus);
     };
 
@@ -159,14 +159,14 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteRoutePermit(token, deleteDialog.busId);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoutePermits(filters)
                 }
 
             } catch (err: any) {
-                console.log(err.message);
+               // console.log(err.message);
                 setError(err.message);
             } finally {
 
@@ -177,7 +177,7 @@ export default function BusManagement() {
 
     const handleCompanySlect = async (data: any) => {
         filters.company_id = data
-        console.log(data)
+       // console.log(data)
         fetchRoute(filters)
     }
 
@@ -187,7 +187,7 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateRoutePermit(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoutePermits(filters)
@@ -195,7 +195,7 @@ export default function BusManagement() {
 
 
             } catch (err: any) {
-                console.log(err.message);
+              //  console.log(err.message);
                 setError(err.message);
             } finally {
 
@@ -205,9 +205,9 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+               // console.log(data)
                 const createRespone = await apiService.createRoutePermits(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoutePermits(filters)

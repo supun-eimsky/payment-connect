@@ -88,8 +88,7 @@ export default function BusTable({ buses, onAdd, onEdit, onDelete, onView }: Bus
         }))
     }
     return (
-        <div className="px-1 lg:px-3">
-            <Card className='py-[15px]'>
+        <>
                 <CardHeader>
                     <div className="flex justify-between items-center">
                         <CardTitle className="text-lg">Bus Stop List</CardTitle>
@@ -191,7 +190,7 @@ export default function BusTable({ buses, onAdd, onEdit, onDelete, onView }: Bus
                         </div>
                     )}
                 </CardContent>
-            </Card>
-        </div>
+            
+        </>
     );
 }

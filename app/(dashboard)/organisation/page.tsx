@@ -70,7 +70,7 @@ export default function organisationManagement() {
             const data = await apiService.getOrganisationsWithFilters(token, null, filterData);
             const busesArray = data || [];
             setOrganisations(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+        //    console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -85,7 +85,7 @@ export default function organisationManagement() {
     };
 
     const handleEdit = (organisation: Organisation) => {
-        console.log(organisation)
+       // console.log(organisation)
         setEditingOrganisation(organisation);
         setShowForm(true);
     };
@@ -94,7 +94,7 @@ export default function organisationManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+       // console.log(bus)
            router.push('/organisation/view?id=' + bus.id)
        // setSelectedItem(bus);
     };
@@ -105,7 +105,7 @@ export default function organisationManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteOrganisation(token, deleteDialog.busId);
-                console.log(createRespone)
+             //   console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchOrganisations(filters)
@@ -128,7 +128,7 @@ export default function organisationManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateOrganisation(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchOrganisations(filters)
@@ -146,9 +146,9 @@ export default function organisationManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+              //  console.log(data)
                 const createRespone = await apiService.createOrganisation(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchOrganisations(filters)

@@ -121,7 +121,7 @@ class ApiClient {
       }
 
       const data = await response.json().catch(() => null);
-      console.log(data,"sdddddddddddddddddddddddddddd")
+     // console.log(data,"sdddddddddddddddddddddddddddd")
       if (!response.ok) {
         const error: ApiError = {
           message: data?.error.message || "something went wrong",

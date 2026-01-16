@@ -157,37 +157,37 @@ const BusDetailsView: React.FC = () => {
     const [assignDevicesForm, setAssignDevicesForm] = useState({
         bus_id: busData ? (id ?? "") : (""),
     });
-   useEffect(() => {
-    // Skip during build
-    if (typeof window === 'undefined') return;
-    
-    setNavbarData("Bus Management", "Bus Management/ View");
-    
-    const searchId = id ?? "";
-    if (searchId) {
-        fetchBusById(searchId);
-        fetchBusAllAssimnet(searchId);
-    }
-    
-    setErrorCrewAssing('');
-    
-    try {
-        const userStr = localStorage.getItem("user");
-        if (userStr) {
-            const parsed = JSON.parse(userStr);
-            const orgId = parsed.organisation_id || null;
-            const compId = parsed.company_id || null;
-            
-            setOrganisationId(orgId);
-            setCompanyId(compId);
-            
-            setFilters((prev: any) => ({ ...prev, company_id: compId }));
-            setCompanyFilters((prev: any) => ({ ...prev, company_id: compId }));
+    useEffect(() => {
+        // Skip during build
+        if (typeof window === 'undefined') return;
+
+        setNavbarData("Bus Management", "Bus Management/ View");
+
+        const searchId = id ?? "";
+        if (searchId) {
+            fetchBusById(searchId);
+            fetchBusAllAssimnet(searchId);
         }
-    } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
-    }
-}, [id, token, setNavbarData]);
+
+        setErrorCrewAssing('');
+
+        try {
+            const userStr = localStorage.getItem("user");
+            if (userStr) {
+                const parsed = JSON.parse(userStr);
+                const orgId = parsed.organisation_id || null;
+                const compId = parsed.company_id || null;
+
+                setOrganisationId(orgId);
+                setCompanyId(compId);
+
+                setFilters((prev: any) => ({ ...prev, company_id: compId }));
+                setCompanyFilters((prev: any) => ({ ...prev, company_id: compId }));
+            }
+        } catch (error) {
+            console.error('Error parsing user data from localStorage:', error);
+        }
+    }, [id, token, setNavbarData]);
 
 
     const fetchUsers = async (filterData: any) => {
@@ -227,7 +227,7 @@ const BusDetailsView: React.FC = () => {
         try {
 
 
-            const data = await apiService.getRouteWithFilters(token, null, filterData);
+            const data = await apiService.getRouteCompany(token, filterData.company_id);
             const busesArray = data.routes;
             setAvailableRoutes(busesArray)
         } catch (err) {
@@ -244,7 +244,7 @@ const BusDetailsView: React.FC = () => {
             setBusCompany(data.company_id)
             setBusData(data)
             filters.company_id = data.company_id
-            filters.limit=100
+            filters.limit = 100
 
             fetchRoute(filters);
             fetchUsers(filters);
@@ -284,7 +284,7 @@ const BusDetailsView: React.FC = () => {
         }
     }
     const handleAssignDevices = async () => {
-        console.log(assignDevicesForm, "assignDevicesFormassignDevicesForm")
+        // console.log(assignDevicesForm, "assignDevicesFormassignDevicesForm")
 
         const createFormData: any = {
             bus_id: id
@@ -300,7 +300,7 @@ const BusDetailsView: React.FC = () => {
         } finally {
 
         }
-        console.log(createFormData)
+        //  console.log(createFormData)
         setIsAssignCompanyOpen(false);
         setAssignCrewForm({ bus_id: busData?.id ?? "", user_id: "", assigned_date: new Date().toISOString().split('T')[0] });
 
@@ -346,17 +346,17 @@ const BusDetailsView: React.FC = () => {
         try {
             const data = await apiService.updateRouteAssignment(token, editForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+            //   console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
-             setIsEditOpen(false);
-             setErrorRouteAssing('')
+            setIsEditOpen(false);
+            setErrorRouteAssing('')
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
             setErrorRouteAssing(err.message);
         } finally {
 
         }
-       
+
         setSelectedAssignment(null);
     };
 
@@ -385,7 +385,7 @@ const BusDetailsView: React.FC = () => {
         try {
             const data = await apiService.routeAssignmentToBus(token, assignForm);
             //setBusData(data)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+            //  console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
             fetchBusAllAssimnet(id ?? "")
             setIsAssignOpen(false);
             setErrorRouteAssing('')
@@ -395,7 +395,7 @@ const BusDetailsView: React.FC = () => {
         } finally {
 
         }
-        
+
         setAssignForm({
             bus_id: busData?.id ?? "",
             route_id: "",
@@ -440,12 +440,12 @@ const BusDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit crew assignment:", editCrewForm);
+        // console.log("Edit crew assignment:", editCrewForm);
         if (!token) return;
         try {
             const data = await apiService.updateCrewAssignment(token, editCrewForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+            //  console.log(data, "updateRouteAssignment")
             setErrorCrewAssing('')
             fetchBusAllAssimnet(id ?? "")
             setIsEditCrewOpen(false);
@@ -474,7 +474,7 @@ const BusDetailsView: React.FC = () => {
         try {
             const data = await apiService.busCrewAssignments(token, createFormData);
             //setBusData(data)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+            //  console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
             fetchBusAllAssimnet(id ?? "")
             setIsAssignCrewOpen(false);
         } catch (err: any) {
@@ -483,7 +483,7 @@ const BusDetailsView: React.FC = () => {
         } finally {
 
         }
-        console.log(createFormData)
+        //  console.log(createFormData)
 
 
         fetchBusAllAssimnet(id ?? "")
@@ -803,14 +803,14 @@ const BusDetailsView: React.FC = () => {
                                                                     <Button className="bg-[#F28603] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => openEditDialog(assignment)}>
                                                                         <img src="/icons/Edit.svg"></img>
                                                                     </Button>
-                                                                    <Button
+                                                                    {/* <Button
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         onClick={() => handleRemoveAssignment(assignment.id)}
                                                                         className="bg-[#FF0000] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800 "
                                                                     >
                                                                         <img src="/icons/trash.svg"></img>
-                                                                    </Button>
+                                                                    </Button> */}
 
                                                                 </div>
                                                                 <div>
@@ -962,14 +962,14 @@ const BusDetailsView: React.FC = () => {
                                                                     <Button className="bg-[#F28603] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => openEditCrewDialog(assignment)}>
                                                                         <img src="/icons/Edit.svg"></img>
                                                                     </Button>
-                                                                    <Button
+                                                                    {/* <Button
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         onClick={() => handleRemoveCrewAssignment(assignment.id)}
                                                                         className="bg-[#FF0000] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800 "
                                                                     >
                                                                         <img src="/icons/trash.svg"></img>
-                                                                    </Button>
+                                                                    </Button> */}
 
 
                                                                 </div>
@@ -1039,11 +1039,11 @@ const BusDetailsView: React.FC = () => {
                                                                         <SelectValue placeholder="Select a devices" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
-                                                                        {availableDevices.length >0?(<>{availableDevices.map((user) => (
+                                                                        {availableDevices.length > 0 ? (<>{availableDevices.map((user) => (
                                                                             <SelectItem key={user.id} value={user.id}>{user.device_code} ({user.model})</SelectItem>
-                                                                        ))}</>):(<>{
+                                                                        ))}</>) : (<>{
                                                                             <SelectItem key="notFound" value="notfound" disabled>Not Found</SelectItem>}</>)}
-                                                                        
+
                                                                     </SelectContent>
                                                                 </Select>
                                                             </div>
@@ -1112,14 +1112,14 @@ const BusDetailsView: React.FC = () => {
                                                                 <Button className="bg-[#F28603] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => openEditCrewDialog(devicesAssignments)}>
                                                                     <img src="/icons/Edit.svg"></img>
                                                                 </Button>
-                                                                <Button
+                                                                {/* <Button
                                                                     variant="ghost"
                                                                     size="icon"
                                                                     onClick={() => handleRemoveCrewAssignment(devicesAssignments.id)}
                                                                     className="bg-[#FF0000] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800 "
                                                                 >
                                                                     <img src="/icons/trash.svg"></img>
-                                                                </Button>
+                                                                </Button> */}
 
 
                                                             </div>
@@ -1212,7 +1212,7 @@ const BusDetailsView: React.FC = () => {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                         {errorRouteAssing && (
+                                        {errorRouteAssing && (
                                             <Alert variant="destructive" className="border-red-500">
                                                 <AlertCircle className="h-4 w-4" />
                                                 <AlertDescription className="ml-2">
@@ -1259,7 +1259,7 @@ const BusDetailsView: React.FC = () => {
                                                 <SelectContent>
                                                     <SelectItem value="active">Active</SelectItem>
                                                     <SelectItem value="inactive">Inactive</SelectItem>
-                                                    
+
                                                 </SelectContent>
                                             </Select>
                                         </div>

@@ -79,6 +79,7 @@ export const API_ENDPOINTS = {
 
   directions: {
     CREATE_DIRECTIONS: `/api/v1/directions`,
+    UPDATE_DIRECTIONS: (id: String) => `/api/v1/directions/${id}`,
     DIRECTION_STOPS: `/api/v1/direction-stops`,
     BOTH_DIRECTION_STOPS_CREATE: '/api/v1/direction-stops/bidirectional'
   },
@@ -86,6 +87,7 @@ export const API_ENDPOINTS = {
     CREATE_ROUTES: `/api/v1/routes`,
     UPDATE_ROUTES: (id: String) => `/api/v1/routes/${id}`,
     GET_ROUTES_COMPANY: (id: String) =>  `/api/v1/routes/company/${id}`,
+    GET_ROUTES_ORGANISATION: (id: String) =>  `/api/v1/routes/organisation/${id}`,
     ROUTES_CATEGORIES: `/api/v1/categories`,
     ROUTES: `/api/v1/routes`,
     ROUTE_BY_ID: (id: String) => `/api/v1/routes/${id}`,
@@ -124,7 +126,10 @@ export const API_ENDPOINTS = {
   },
   busStop: {
     CREATE_BUS_STOP: `/api/v1/stops`,
-    BUS_STOPS: `/api/v1/stops`,
+    UPDATE_BUS_STOP: (id: String) => `/api/v1/stops/${id}`,
+    BUS_STOP_BY_ID: (id: String) => `/api/v1/stops/${id}`,
+    DELETE_BUS_STOP: (id: String) => `/api/v1/stops/${id}`,
+    BUS_STOPS: `/api/v1/stops/list`,
   },
   organisation: {
     ORGANISATIONS: `/api/v1/organisations`,

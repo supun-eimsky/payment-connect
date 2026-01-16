@@ -18,7 +18,16 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+const userStr = localStorage.getItem("user")
+let Organisation_ID: any = null;
+let COMPANY_ID: any = null;
+let role: any = null;
+if (userStr) {
+    const parsed = JSON.parse(userStr);
+    Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
+    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    role = parsed.user_type ? (parsed.user_type) : (null);
+}
 const COLUMNS = [
     // { key: "company_id", label: "Company", defaultVisible: true },
     // { key: "fleet_number", label: "Fleet Number", defaultVisible: true },
@@ -58,15 +67,15 @@ const renderCell = (row: Devices, columnKey: string, onEdit: any, onDelete: any,
         case "action":
             return (
                 <div className="flex justify-start gap-3">
-
-                    <Button className="bg-[#F28603] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onEdit(row)}>
-                        <img src="/icons/Edit.svg"></img>
-                    </Button>
+                    {role == "system" || role == "organisation_admin" ? (
+                        <Button className="bg-[#F28603] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onEdit(row)}>
+                            <img src="/icons/Edit.svg"></img>
+                        </Button>) : null}
                     <Button className="bg-[#F5C300EB] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onView(row)}>
                         <img src="/icons/view_icon.svg"></img>
                     </Button>
 
-                    <div >
+                    {/* <div >
                         <Button
                             variant="ghost"
                             size="icon"
@@ -75,7 +84,7 @@ const renderCell = (row: Devices, columnKey: string, onEdit: any, onDelete: any,
                         >
                             <img src="/icons/trash.svg"></img>
                         </Button>
-                    </div>
+                    </div> */}
 
                 </div>
             );
@@ -84,6 +93,7 @@ const renderCell = (row: Devices, columnKey: string, onEdit: any, onDelete: any,
             return ""
     }
 }
+
 export default function DeviceTable({ buses, onAdd, onEdit, onDelete, onView }: DeviceTableProps) {
     const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
         COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {}),
@@ -138,14 +148,15 @@ export default function DeviceTable({ buses, onAdd, onEdit, onDelete, onView }: 
                                 <SlidersHorizontal className="w-4 h-4" />
                                 Filters
                             </Button>
-                            <Button
+                            {role == "system" || role == "organisation_admin" ? (<Button
                                 onClick={onAdd}
 
                                 className="flex items-center gap-2 text-white font-medium rounded-[14px] px-5 py-2 bg-gradient-to-r from-[#0F90EE] to-[#276CCC] hover:opacity-90 shadow-md"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add Devices
-                            </Button>
+                            </Button>) : null}
+
 
                         </div>
                     </CardAction>

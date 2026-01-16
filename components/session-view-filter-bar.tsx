@@ -22,10 +22,13 @@ interface companyFilters {
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
+
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
     COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    role = parsed.user_type ? (parsed.user_type) : (null)
 }
 const STATUS_LIST = [
     {
@@ -64,7 +67,7 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
         limit: 50,
     });
     const handleApply = () => {
-        console.log({ route, busNumber, conductor, date })
+        //console.log({ route, busNumber, conductor, date })
         onFilterSubmit({
             route_id: route || undefined,
             bus_id: busNumber || undefined,
@@ -115,7 +118,16 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setCompaniesList(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+            if (role == "organisation_admin") {
+                setCompany(busesArray.data && busesArray.data.length > 0 ? busesArray.data[0].id : "")
+
+                filters.company_id = busesArray.data && busesArray.data.length > 0 ? busesArray.data[0].id : "";
+
+                getRouteCompany(filters)
+                fetchBuses(filters)
+            }
+
+            //  console.log('Company Details Data:', busesArray);
             return
         } catch (err: any) {
             console.error('Company to fetch bus', err);
@@ -135,7 +147,7 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
             const busesArray = data.routes;
             setRouteList(busesArray)
             return
-            console.log('Route  dsssssss:', busesArray);
+            //  console.log('Route  dsssssss:', busesArray);
         } catch (err) {
             console.error('Route  d', err);
         } finally {
@@ -152,7 +164,7 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
             const busesArray = data.routes;
             setRouteList(busesArray)
             return
-            console.log('Route  dsssssss:', busesArray);
+            //   console.log('Route  dsssssss:', busesArray);
         } catch (err) {
             console.error('Route  d', err);
         } finally {
@@ -167,13 +179,13 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
             // Call with filter
             /// setLoading(true)
             filterData.limit = 100;
-            console.log(filterData);
-            console.log("filterDatafilterDatafilterData");
+            //  console.log(filterData);
+            //  console.log("filterDatafilterDatafilterData");
             const data = await apiService.getBusWithFilters(token, null, filterData);
             const busesArray = data || [];
             setBusedList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Bus Details Data:', busesArray);
+            // console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -184,6 +196,7 @@ export function SessionViewFilterBar({ onFilterSubmit, isLoading }: SessionViewF
 
     useEffect(() => {
         fetchCompanies(filters)
+
         if (!COMPANY_ID) {
             fetchRoute(filters)
         } else {

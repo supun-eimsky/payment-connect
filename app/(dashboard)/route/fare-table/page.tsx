@@ -107,6 +107,16 @@ interface FareMatrix {
   half_amount_lkr: number;
   distance_km: number;
 }
+ const userStr = localStorage.getItem("user")
+let Organisation_ID: any = null;
+let COMPANY_ID: any = null;
+let role: any = null;
+if (userStr) {
+    const parsed = JSON.parse(userStr);
+    Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
+    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null);
+    role = parsed.user_type ? (parsed.user_type) : (null);
+}
 export default function FareMatrixUI() {
   const { token } = useAuth();
   const [fares, setFares] = useState<Fare[]>([]);
@@ -176,11 +186,11 @@ export default function FareMatrixUI() {
 
         setFares(firstHalf)
         const NewArray = generateFareMatrix(data.directions[0].stops, data.directions[0].id)
-        console.log(NewArray)
+       // console.log(NewArray)
         srtReverseDirectionId(data.directions[1].id)
 
         const newBuildObjet = mergeFareData(firstHalf, NewArray, category_id)
-        console.log(newBuildObjet, "selectCatIdselectCatIdselectCatId")
+       // console.log(newBuildObjet, "selectCatIdselectCatIdselectCatId")
         setFares(newBuildObjet)
       } else {
         const NewArray = generateFareMatrix(data.directions[0].stops, data.directions[0].id)
@@ -202,8 +212,8 @@ export default function FareMatrixUI() {
     // Create a deep copy of input2 to avoid mutating the original
 
 
-    console.log(input1, "inout1")
-    console.log(input2, 'inout2')
+   // console.log(input1, "inout1")
+    //console.log(input2, 'inout2')
     const result = JSON.parse(JSON.stringify(input2)) as Fare[];
 
     // Create a map for quick lookup from input1
@@ -225,7 +235,7 @@ export default function FareMatrixUI() {
       let sethalf_amount_lkr = 0
       let setNew_fare = true
       if (matchingItem?.categories && matchingItem.categories.length > 0) {
-        console.log(selectCatId, "ssssssssssssssswwwwwwwwwwwwwwwwwwww")
+       // console.log(selectCatId, "ssssssssssssssswwwwwwwwwwwwwwwwwwww")
         const selectMatchingItem = matchingItem.categories.find(item => item.category_id === selectCatId);
         if (selectMatchingItem) {
           setfull_amount_lkr = selectMatchingItem.full_amount_lkr
@@ -305,9 +315,9 @@ export default function FareMatrixUI() {
     if (new_fare) {
       try {
         // setError("");
-        console.log(data)
+       // console.log(data)
         const createRespone = await apiService.createFares(token, data);
-        console.log(createRespone)
+       // console.log(createRespone)
         fetchRoute(categoryId)
         if (createRespone.success) {
           // setShowForm(false);
@@ -322,9 +332,9 @@ export default function FareMatrixUI() {
     } else {
       try {
         // setError("");
-        console.log(data, "ssssssdsdsdsdsd")
+       // console.log(data, "ssssssdsdsdsdsd")
         const createRespone = await apiService.updateFares(token, data, categoryId);
-        console.log(createRespone)
+      //  console.log(createRespone)
 
         fetchRoute(categoryId)
 
@@ -366,7 +376,7 @@ export default function FareMatrixUI() {
 
   const handleSave = (): void => {
     if (!editingFare) return;
-    console.log(editingFare)
+   // console.log(editingFare)
     const fullAmount = parseFloat(tempFull);
     const halfAmount = parseFloat(tempHalf);
 
@@ -384,7 +394,7 @@ export default function FareMatrixUI() {
     setChangedFareIds(prev => new Set([...prev, editingFare.id]));
     setIsDialogOpen(false);
     setEditingFare(null);
-    console.log(buildObjet)
+    //console.log(buildObjet)
     handleFormSubmit(buildObjet, editingFare.new_fare ?? true)
 
 
@@ -522,14 +532,14 @@ export default function FareMatrixUI() {
                                       <div className="text-[10px] font-medium">
                                         {fare.half_amount_lkr.toFixed(2)}
                                       </div>
-                                      <Button
+                                     {role=="system"?(<Button
                                         variant="ghost"
                                         size="sm"
                                         className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity p-0.5 h-5 w-5"
                                         onClick={() => handleEdit(fare)}
                                       >
                                         <Pencil className="w-3 h-3" />
-                                      </Button>
+                                      </Button>):null} 
                                     </div>
 
 

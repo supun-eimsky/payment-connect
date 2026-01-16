@@ -16,15 +16,19 @@ import Image from "next/image"
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
     COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    role = parsed.user_type ? (parsed.user_type) : (null)
 }
 
 
 export default function TripsPage() {
     const [selectedTrip, setSelectedTrip] = useState<TripDetails | null>(null);
+        const [companiesList, setCompaniesList] = useState<any[]>([]);
+    
     const [trips, setTrips] = useState<Trip[]>([]);
     const [loading, setLoading] = useState(true);
     const [detailsLoading, setDetailsLoading] = useState(false);
@@ -46,7 +50,13 @@ export default function TripsPage() {
     useEffect(() => {
         setNavbarData("Session View", "Session View / Session View");
         // fetchStats()
-        fetchTrips(filters)
+        if(role==="organisation_admin"){
+            filters.organisation_id=Organisation_ID,
+            fetchCompanies(filters)
+        }else{
+              fetchTrips(filters)
+        }
+      
     }, [token]);
     useEffect(() => {
         // Select first trip by default
@@ -76,7 +86,28 @@ export default function TripsPage() {
 
         return () => observer.disconnect();
     }, [hasMore, loadingMore, cursor]);
+    const fetchCompanies = async (filterData: any) => {
+        if (!token) return;
+        try {
 
+            // Call with filter
+            filterData.limit = 100;
+            //  setLoading(true)
+            const data = await apiService.getCompaniesWithFilters(token, null, filterData);
+            const busesArray = data || [];
+            setCompaniesList(busesArray.data);
+            filters.company_id = busesArray.data && busesArray.data.length > 0 ? busesArray.data[0].id : "";
+            fetchTrips(filters)
+            //  console.log('Company Details Data:', busesArray);
+            return
+        } catch (err: any) {
+            console.error('Company to fetch bus', err);
+            //  setError(err.message);
+        } finally {
+            //  setLoading(false);
+        }
+
+    }
     const getFullTripDetails = async (id: string) => {
         if (!token) return;
         setLoading(false);
@@ -89,14 +120,14 @@ export default function TripsPage() {
             const tripsArray = data || [];
             setSelectedTrip(tripsArray || null);
             if (tripsArray.sessions.length > 0) {
-    
-                    const totalDuration = tripsArray.sessions.reduce((sum: number, item: any) => {
-                        return sum + (item.duration_minutes ?? 0);
-                    }, 0);
-                    console.log(totalDuration,"Pagination sdfsj")
-                    setTotalDuration(totalDuration)
-                }
-                console.log('Trip Details Data:', tripsArray);
+
+                const totalDuration = tripsArray.sessions.reduce((sum: number, item: any) => {
+                    return sum + (item.duration_minutes ?? 0);
+                }, 0);
+                // console.log(totalDuration,"Pagination sdfsj")
+                setTotalDuration(totalDuration)
+            }
+            // console.log('Trip Details Data:', tripsArray);
         } catch (err) {
             console.error('Failed to fetch stats', err);
         } finally {
@@ -125,7 +156,7 @@ export default function TripsPage() {
             setTrips(tripsArray.data);
             setCursor(tripsArray.next_cursor ?? "");
             setHasMore(tripsArray.has_more ?? false);
-            console.log('Trip Details Data:', tripsArray.has_more);
+            // console.log('Trip Details Data:', tripsArray.has_more);
         } catch (err) {
             console.error('Failed to fetch trips', err);
         } finally {
@@ -160,7 +191,7 @@ export default function TripsPage() {
         }
     };
     const handleFilterSubmit = (filterData: any) => {
-        console.log('Received filters:', filterData);
+        // console.log('Received filters:', filterData);
 
         // Update filters state
         setFilters({
@@ -206,7 +237,7 @@ export default function TripsPage() {
 
     }
     const handleItemView = (bus: any) => {
-        console.log(bus)
+        // console.log(bus)
         router.push('/ticket-details')
         // setSelectedItem(bus);
     };

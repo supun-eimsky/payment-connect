@@ -23,27 +23,29 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { AlertCircle,Code,AppWindow } from 'lucide-react';
+import { AlertCircle, Code, AppWindow } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
-    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null);
+    role = parsed.user_type ? (parsed.user_type) : (null);
 }
 const STSTUS_LIST = [
-  {
-    "lable": "Active",
-    "value": "active"
-  },
-  {
-    "lable": "Inactive",
-    "value": "inactive"
-  }
+    {
+        "lable": "Active",
+        "value": "active"
+    },
+    {
+        "lable": "Inactive",
+        "value": "inactive"
+    }
 ];
 
 
@@ -59,6 +61,7 @@ export default function BusManagement() {
     const [selectedItem, setSelectedItem] = useState(null)
     const [filters, setFilters] = useState<BusFilters>({
         company_id: COMPANY_ID,
+        organisation_id: Organisation_ID,
         offset: 0,
         limit: 10,
 
@@ -96,19 +99,39 @@ export default function BusManagement() {
     }, []);
     const fetchRoute = async (filterData: any) => {
         if (!token) return;
-        try {
+        if (role === "company_admin" || role === "company_onwner") {
+            try {
 
-            // Call with filter
-            setLoading(true)
-            const data = await apiService.getRouteWithFilters(token, null, filterData);
-            const busesArray = data.routes;
-            setRoutePermits(busesArray);
-            console.log('Route  dsssssss:', busesArray);
-        } catch (err) {
-            console.error('Route  d', err);
-        } finally {
-            setLoading(false);
+                // Call with filter
+                //    setLoading(true)
+                const data = await apiService.getRouteCompany(token, filterData.company_id);
+                const busesArray = data.routes;
+                setRoutePermits(busesArray);
+                console.log(busesArray)
+                return
+                //  console.log('Route  dsssssss:', busesArray);
+            } catch (err) {
+                console.error('Route  d', err);
+            } finally {
+                // setLoading(false);
+            }
+        } else {
+
+            try {
+
+                // Call with filter
+                setLoading(true)
+                const data = await apiService.getRouteWithFilters(token, null, filterData);
+                const busesArray = data.routes;
+                setRoutePermits(busesArray);
+                console.log('Route  dsssssss:', busesArray);
+            } catch (err) {
+                console.error('Route  d', err);
+            } finally {
+                setLoading(false);
+            }
         }
+
 
     }
     const handleAdd = () => {
@@ -116,11 +139,11 @@ export default function BusManagement() {
         setShowForm(true);
     };
     const onViewFareTable = (bus: any) => {
-        console.log(bus.id)
+        // console.log(bus.id)
         router.push('/route/fare-table?id=' + bus.id, undefined)
     };
     const handleEdit = (bus: Route) => {
-        console.log(bus)
+        // console.log(bus)
         setEditingRoutePermit(bus);
         setShowForm(true);
     };
@@ -129,7 +152,7 @@ export default function BusManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+        // console.log(bus)
         router.push('/route/route-view/?id=' + bus.id)
     };
 
@@ -139,7 +162,7 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteRoutePermit(token, deleteDialog.busId);
-                console.log(createRespone)
+                // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoute(filters)
@@ -161,7 +184,7 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateRoute(token, data);
-                console.log(createRespone)
+                //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoute(filters)
@@ -180,9 +203,9 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+                //  console.log(data)
                 const createRespone = await apiService.createRoute(token, data);
-                console.log(createRespone)
+                //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoute(filters)
@@ -197,17 +220,17 @@ export default function BusManagement() {
 
     };
     const handleFilterValuesRest = async (data: FilterValues) => {
-        console.log(data)
+        //  console.log(data)
 
         location.reload()
 
     }
 
     const handleFilterValues = async (data: FilterValues) => {
-        console.log(data)
+        //  console.log(data)
         const merged = { ...filters, ...data };
         setFilters(merged)
-       // fetchBuses(merged);
+        // fetchBuses(merged);
 
     }
 

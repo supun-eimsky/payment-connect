@@ -20,8 +20,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card } from '@/components/ui/card';
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
@@ -40,10 +41,13 @@ export default function BusStop() {
     const [editingBus, setEditingBus] = useState<BusStops | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [hasMore, setHasMore] = useState(false);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
+    const [previousCursor, setPreviousCursor] = useState<string | null>(null);
     const [selectedItem, setSelectedItem] = useState(null)
     const [filters, setFilters] = useState<BusStopFilters>({
         offset: 0,
-        limit: 100,
+        limit: 15,
 
     });
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; busId: string | null }>({
@@ -55,16 +59,20 @@ export default function BusStop() {
         setNavbarData('Bus Stop Management', 'Bus Stop Management / Bus Stop List');
         fetchBusStop(filters)
     }, []);
-    const fetchBusStop = async (filterData: any) => {
+    const fetchBusStop = async (filterData: any, cursor?: string | null) => {
         if (!token) return;
         try {
 
             // Call with filter
             setLoading(true)
-            const data = await apiService.getBusStopWithFilters(token, filterData);
+            const data = await apiService.getBusStopWithFilters(token,cursor, filterData);
             const busesArray = data || [];
-            setBuses(busesArray);
-            console.log('Bus Details Data:', busesArray);
+
+            setBuses(busesArray.data || []);
+            setHasMore(busesArray.has_more);
+            setNextCursor(busesArray.next_cursor ?? null);
+            setPreviousCursor(busesArray.previous_cursor ?? null);
+           // console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -78,7 +86,7 @@ export default function BusStop() {
     };
 
     const handleEdit = (bus: BusStops) => {
-        console.log(bus)
+      //  console.log(bus)
         setEditingBus(bus);
         setShowForm(true);
     };
@@ -87,17 +95,17 @@ export default function BusStop() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
-       setSelectedItem(bus);
+      //  console.log(bus)
+        setSelectedItem(bus);
     };
 
     const confirmDelete = async () => {
         if (deleteDialog.busId) {
-            // setBuses((prev) => prev.filter((bus) => bus.id !== deleteDialog.busId));
+
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteBus(token, deleteDialog.busId);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchBusStop(filters)
@@ -115,33 +123,34 @@ export default function BusStop() {
     };
 
     const handleFormSubmit = async (data: BusStopFormData) => {
-        console.log(data)
+       // console.log(data)
         if (editingBus) {
+          //  console.log("Edit bus functionality is not implemented yet.");
 
-            // if (!token) return;
-            // try {
-            //     const createRespone = await apiService.updateBus(token, data);
-            //     console.log(createRespone)
-            //     if (createRespone.success) {
-            //         setShowForm(false);
-            //         fetchBuses(filters)
-            //     }
+            if (!token) return;
+            try {
+                const createRespone = await apiService.updateBusStop(token, data);
+               // console.log(createRespone)
+                if (createRespone.success) {
+                    setShowForm(false);
+                    fetchBusStop(filters)
+                }
 
 
-            // } catch (err: any) {
-            //     console.log(err.message);
-            //     setError(err.message);
-            // } finally {
+            } catch (err: any) {
+                console.log(err.message);
+                setError(err.message);
+            } finally {
 
-            // }
-            //setShowForm(false);
+            }
+            setShowForm(false);
         } else {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+              //  console.log(data)
                 const createRespone = await apiService.createBusStop(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchBusStop(filters)
@@ -155,7 +164,20 @@ export default function BusStop() {
         }
 
     };
+    const handleNext = () => {
+        //console.log('Next cursor:', nextCursor);
+        if (hasMore && nextCursor) {
+            fetchBusStop(filters, nextCursor);
+        }
+    };
 
+    // Handle previous page
+    const handlePrevious = () => {
+        if (previousCursor != "") {
+
+           fetchBusStop(filters, previousCursor);
+        }
+    };
     return (
         <div className="flex flex-col flex-1">
             <div className="@container/main flex flex-1 flex-col gap-2">
@@ -185,7 +207,44 @@ export default function BusStop() {
                         />
 
                     ) : (
-                        <BusStopTable buses={buses} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} onView={handleItemView}/>
+                        <>
+                            <div className="px-1 lg:px-3">
+                                <Card className='py-[15px]'>
+                                    <BusStopTable buses={buses} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} onView={handleItemView} />
+                                </Card>
+                                <div className="flex justify-end gap-2 px-1 lg:px-3 pb-4">
+                                    <div className="mt-6 flex items-center justify-between">
+
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handlePrevious}
+                                                disabled={previousCursor == null || previousCursor == "" || loading}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${previousCursor == null || loading
+                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                                                    }`}
+                                            >
+                                                <ChevronLeft size={16} />
+                                                Previous
+                                            </button>
+
+                                            <button
+                                                onClick={handleNext}
+                                                disabled={!hasMore || loading}
+                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${!hasMore || loading
+                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600'
+                                                    }`}
+                                            >
+                                                Next
+                                                <ChevronRight size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </>
                     )}
 
                     <AlertDialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, busId: null })}>

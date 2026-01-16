@@ -25,6 +25,7 @@ export default function BusForm({
   companyId,
   initialData,
   companyList,
+  categories,
   onSubmit,
   onCancel,
   onfilter
@@ -38,6 +39,7 @@ export default function BusForm({
     seating_capacity: 0,
     standing_capacity: 0,
     company_id: companyId,
+    category_id: '',
     id: null
   });
 
@@ -240,6 +242,32 @@ export default function BusForm({
                   <p className="text-red-500 text-sm">{errors.standing_capacity}</p>
                 )}
               </div>
+
+              {categories ? (<div className="space-y-2">
+                <Label className="block text-gray-700 font-medium mb-2">
+                  Categories *
+                </Label>
+              <Select
+                  value={formData.category_id ? String(formData.category_id) : ''}
+                  onValueChange={(value) => handleChange('category_id', value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((item, index) => (
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+
+                {errors.category_id && (
+                  <p className="text-red-500 text-sm">{errors.category_id}</p>
+                )}
+              </div>) : ('')}
             </div>
 
             <div className="flex justify-end gap-3 pt-4">

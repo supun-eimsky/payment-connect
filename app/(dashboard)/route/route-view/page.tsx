@@ -51,7 +51,7 @@ import { DetailPopup } from '@/components/detail-popup'
 import { useNavbar } from "@/context/navbar-context"
 import { useAuth } from '@/hooks/useAuth';
 import { RouteCard } from "@/components/route/route-card";
-import { AppWindowIcon, CodeIcon, Eye, Navigation, Plus, MapPin, ChevronUp, ChevronDown, Map, Trash2, X, Check, ChevronsUpDown, Loader2, AlertCircle } from "lucide-react"
+import { AppWindowIcon, CodeIcon, Eye, Navigation, Plus, MapPin, ChevronUp, ChevronDown, Map, Trash2, X, Check, ChevronsUpDown, Loader2, AlertCircle, Pencil } from "lucide-react"
 import { RouteData, StopFaresResponse } from '@/types/route';
 import GoogleMapComponent from "@/components/map";
 import RouteFormAddBus from "@/components/route/route-form-add-bus";
@@ -100,6 +100,7 @@ export default function RouteView() {
   const [stopFaresData, setStopFaresData] = useState<{ [key: string]: StopFaresResponse }>({});
   const [loadingStops, setLoadingStops] = useState<{ [key: string]: boolean }>({});
   const [fareErrors, setFareErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof any, string>>>({});
 
   const [routeData, setRouteData] = useState<RouteData>({
     route: {
@@ -117,6 +118,16 @@ export default function RouteView() {
     limit: 10,
 
   });
+  const userStr = localStorage.getItem("user")
+let Organisation_ID: any = null;
+let COMPANY_ID: any = null;
+let role: any = null;
+if (userStr) {
+    const parsed = JSON.parse(userStr);
+    Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
+    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null);
+    role = parsed.user_type ? (parsed.user_type) : (null);
+}
   const [fares, setFares] = useState([
     {
       id: "fare-1",
@@ -160,13 +171,24 @@ export default function RouteView() {
       ]
     }
   ]);
+  const [formData, setFormData] = useState<DirectionsFormData>({
+    start_location: '',
+    end_location: '',
+    total_distance: 0,
+    estimated_duration: 0,
+    route_id: null,
+    id: null
+  });
   const [selectedStopsToAdd, setSelectedStopsToAdd] = useState<SelectedStop[]>([]);
   const [busStopsMapPoint, setBusStopsMapPoint] = useState<BusStopMapPoint[]>([]);
   const [currentDirectionId, setCurrentDirectionId] = useState<string | null>(null);
+  const [isAssignOpen, setIsAssignOpen] = useState(false);
+
   const [stopSearchQuery, setStopSearchQuery] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [busStopUpdate, setBusStopUpdate] = useState<boolean>(false);
   const [isDirectionCreate, setIsDirectionCreate] = useState<boolean>(false);
+  const [isDirectionEdit, setIsDirectionEdit] = useState<boolean>(false);
   const [commandSearch, setCommandSearch] = useState<string>('');
   const [directionId, setDirectionId] = useState<string>('');
   const [reverseDirectionId, setReverseDirectionId] = useState<string>('');
@@ -204,7 +226,9 @@ export default function RouteView() {
     // fetchStats();
   }, [token, setNavbarData]);
 
-
+  const handleChange = (field: keyof DirectionsFormData, value: string | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
   const fetchAvailableStop = async () => {
     if (!token) return;
     try {
@@ -215,7 +239,7 @@ export default function RouteView() {
       const busesArray = data || [];
       setAvailableStops(busesArray)
       //  setBuses(busesArray);
-      console.log('Bus Stop list Details Data:', busesArray);
+    //  console.log('Bus Stop list Details Data:', busesArray);
     } catch (err) {
       console.error('Failed to fetch bus', err);
     } finally {
@@ -253,7 +277,7 @@ export default function RouteView() {
 
     try {
       const data = await apiService.getFaresToBusStop(token, directionId, stopId);
-      console.log('fetching stop fares:', data)
+    //  console.log('fetching stop fares:', data)
 
 
       setStopFaresData(prev => ({
@@ -278,7 +302,7 @@ export default function RouteView() {
       setLoading(true)
       const data = await apiService.getRouteData(token, id,);
       const busesArray = data || [];
-      console.log(busesArray, "rtrtrtrtrtlllllll")
+    //  console.log(busesArray, "rtrtrtrtrtlllllll")
       setRouteData(busesArray)
       setRouteinfo(busesArray.route)
       if (busesArray.directions.length > 0) {
@@ -308,13 +332,34 @@ export default function RouteView() {
     }
 
   }
+  const handleEditFormSubmit = async (data: DirectionsFormData) => {
+    if (!token) return false;
+    try {
+      setError("");
+      const editRespone = await apiService.updatedirection(token, data);
+    //  console.log(editRespone)
+      if (editRespone.success) {
+        fetchRouteData(filters, route_id ?? "")
+        return true;
+      }
+
+    } catch (err: any) {
+      console.log(err.message);
+      return false
+      setError(err.message);
+    } finally {
+
+    }
+
+
+  }
   const handleFormSubmit = async (data: DirectionsFormData) => {
     if (!token) return;
     try {
       setError("");
-      console.log(data)
+    //  console.log(data)
       const createRespone = await apiService.createdirection(token, data);
-      console.log(createRespone)
+    //  console.log(createRespone)
       if (createRespone.success) {
         fetchRouteData(filters, route_id ?? "")
         return true
@@ -375,7 +420,7 @@ export default function RouteView() {
         setError("");
 
         const createRespone = await apiService.updateBothDirectionStops(token, payload);
-        console.log(createRespone)
+       /// console.log(createRespone)
         if (createRespone.success) {
           setShowAddStopsModal(false);
           setSelectedStopsToAdd([]);
@@ -396,7 +441,7 @@ export default function RouteView() {
         setError("");
 
         const createRespone = await apiService.createDirectionStops(token, payload);
-        console.log(createRespone)
+       // console.log(createRespone)
         if (createRespone.success) {
           setShowAddStopsModal(false);
           setSelectedStopsToAdd([]);
@@ -435,14 +480,82 @@ export default function RouteView() {
     return availableStops.find(s => s.id === stopId);
   };
   const addBustopView = () => {
-    console.log(selectedStopsToAdd)
+  //  console.log(selectedStopsToAdd)
     setShowAddStopsModal(true)
+  };
+  const setDirectionData = (data: any) => {
+   // console.log("ssssssssdfkgdfjgkj")
+   // console.log(data)
+    setIsAssignOpen(true)
+    setFormData({
+      start_location: data.start_location,
+      end_location: data.end_location,
+      total_distance: data.total_distance_km,
+      estimated_duration: data.estimated_duration_minutes,
+      route_id: route_id,
+      id: data.id
+    })
+    // setIsDirectionEdit(true)
+
   };
   const setBusStopForDirection = (BusStopArray: any[], direction_id: string) => {
     setDirectionId(direction_id)
     setSelectedStopsToAdd(transformStops(BusStopArray).stops)
     // const output = mapViewStops(busesArray.directions[0].stops);
     setBusStopsMapPoint(mapViewStops(BusStopArray).stops)
+  };
+  const validate = (): boolean => {
+    const newErrors: Partial<Record<keyof DirectionsFormData, string>> = {};
+    (Object.keys(formData) as (keyof DirectionsFormData)[]).forEach((key) => {
+      if (
+        formData[key] === '' ||
+        formData[key] === 0 ||
+        formData[key] === undefined
+      ) {
+        newErrors[key] = 'This field is required';
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleSubmit = async () => {
+   // console.log(formData)
+
+    if (!validate()) return;
+
+    //console.log(route_id)
+    //console.log("route_id s")
+    const fullformData = {
+      start_location: formData.start_location,
+      end_location: formData.end_location,
+      total_distance: formData.total_distance,
+      estimated_duration: formData.estimated_duration,
+      route_id: route_id,
+      id: formData.id
+
+    }
+    if (await handleEditFormSubmit(fullformData)) {
+        setIsAssignOpen(false)
+      setFormData({
+        start_location: '',
+        end_location: '',
+        total_distance: 0,
+        estimated_duration: 0,
+        route_id: null,
+        id: null
+      })
+    }
+  };
+  const handleClose = (type: string) => {
+    setIsAssignOpen(false)
+    setFormData({
+      start_location: '',
+      end_location: '',
+      total_distance: 0,
+      estimated_duration: 0,
+      route_id: null,
+      id: null
+    })
   };
   return (
     <div>
@@ -451,7 +564,7 @@ export default function RouteView() {
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-2 md:py-5">
             <div className="px-1 lg:px-3">
-              <RouteCard initialData={null} onSubmit={handleFormSubmit} routeDataSet={routeinfo} directionCreate={isDirectionCreate} />
+              <RouteCard initialData={null} onSubmit={handleFormSubmit} routeDataSet={routeinfo} directionCreate={isDirectionCreate} directionEdit={isDirectionEdit} />
 
 
             </div>
@@ -486,17 +599,139 @@ export default function RouteView() {
                       className='w-full'>
                       <Card className='gap-3'>
                         <CardHeader>
-                          <CardTitle className='font-bold'>{direction.start_location} → {direction.end_location}</CardTitle>
+                          <CardTitle className='font-bold'>
+                            <div className="p-0">
+                              <div className="grid grid-cols-2 gap-4 mb-1">
+                                <div className="grid grid-cols-2 gap-4 mb-1">
+                                  <div>
+                                    {direction.start_location} → {direction.end_location}
+                                  </div>
+                                  <div>
+
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+
+
+                          </CardTitle>
                           <CardAction>
 
-                            <Button
-                              onClick={addBustopView}
 
-                              className="flex items-center gap-2 text-white font-medium rounded-[14px] px-5 py-2 bg-gradient-to-r from-[#0F90EE] to-[#276CCC] hover:opacity-90 shadow-md"
-                            >
-                              <Plus className="w-4 h-4" />
-                              {busStopUpdate ? "Update" : "Add"} Bus Stop
-                            </Button>
+
+                            <Dialog open={isAssignOpen} onOpenChange={(e) => setDirectionData(direction)}>
+                              <DialogTrigger asChild   >
+                              {role=="system"?(<Button
+
+
+                                  className="flex items-center gap-2 
+                                                        text-white font-medium
+                                                        rounded-[14px]
+                                                        px-5 py-2
+                                                        bg-gradient-to-r from-[#0F90EE] to-[#276CCC]
+                                                        hover:opacity-90
+                                                        shadow-md">
+                                  <Pencil className="h-4 w-4" />
+                                  Update Direction {idx + 1}
+                                </Button>):null}  
+                              </DialogTrigger>
+                              <DialogContent className='w-500'>
+                                <DialogHeader>
+                                  <DialogTitle>Update Direction {idx + 1} </DialogTitle>
+
+                                </DialogHeader>
+
+                                <div className="space-y-6">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+
+                                    <div className="space-y-2">
+                                      <Label className="block text-gray-700 font-medium mb-2">Start location*</Label>
+                                      <Input className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="Start location"
+                                        required
+                                        value={formData.start_location}
+                                        onChange={(e) => handleChange('start_location', e.target.value)}
+                                      />
+                                      {errors.start_location && (
+                                        <p className="text-red-500 text-sm">{errors.start_location}</p>
+                                      )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="block text-gray-700 font-medium mb-2">End Location *</Label>
+                                      <Input
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        value={formData.end_location}
+                                        placeholder="End location"
+                                        required
+                                        onChange={(e) => handleChange('end_location', e.target.value)}
+                                      />
+                                      {errors.end_location && (
+                                        <p className="text-red-500 text-sm">{errors.end_location}</p>
+                                      )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="block text-gray-700 font-medium mb-2">Total Distance *</Label>
+                                      <Input
+                                        type="number"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        value={formData.total_distance}
+                                        placeholder="Total Distance"
+                                        required
+                                        onChange={(e) => handleChange('total_distance', Number(e.target.value))}
+                                      />
+                                      {errors.total_distance && (
+                                        <p className="text-red-500 text-sm">{errors.total_distance}</p>
+                                      )}
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="block text-gray-700 font-medium mb-2">Estimated Duration(min) *</Label>
+                                      <Input
+                                        type="number"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        value={formData.estimated_duration}
+                                        placeholder="Estimated Duration"
+                                        required
+                                        onChange={(e) => handleChange('estimated_duration', Number(e.target.value))}
+                                      />
+                                      {errors.estimated_duration && (
+                                        <p className="text-red-500 text-sm">{errors.estimated_duration}</p>
+                                      )}
+                                    </div>
+
+
+
+
+                                  </div>
+
+                                  <div className="flex justify-start gap-3 pt-4">
+                                    <Button className="bg-blue-400 hover:bg-blue-600 text-white h-11 rounded-12 px-6"
+                                      onClick={handleSubmit}
+                                    >
+
+                                      {/* {initialData ? 'Update' : 'Save'} */}
+                                      Update
+                                    </Button>
+                                    <Button className=" h-11 rounded-12 px-6" variant="outline"
+                                      onClick={() => handleClose("close")}
+                                    >
+                                      Cancel
+                                    </Button>
+
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  {/* <Button variant="outline" onClick={() => setIsAssignOpen(false)}>Cancel</Button> */}
+
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+
                           </CardAction>
                           <CardDescription>
                             <div className="p-0">
@@ -534,10 +769,14 @@ export default function RouteView() {
                                       <span className="text-sm text-gray-500">({direction.stops.length} stops)</span>
                                     </div>
                                   </div>
-                                  {/* <button className="flex items-center gap-2 px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm">
+                                {role=="system"?(<Button
+                                    onClick={addBustopView}
+
+                                    className="flex items-center gap-2 text-white font-medium rounded-[14px] px-5 py-2 bg-gradient-to-r from-[#0F90EE] to-[#276CCC] hover:opacity-90 shadow-md"
+                                  >
                                     <Plus className="w-4 h-4" />
-                                    Add Stop
-                                  </button> */}
+                                    {busStopUpdate ? "Update" : "Add"} Bus Stop
+                                  </Button>):null}  
                                 </div>
 
 

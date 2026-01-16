@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const initAuth = () => {  
       const storedToken = getTokenFromStorage();
       const storedUser = localStorage.getItem('user');
-      console.log('Initializing auth with token:', storedToken);
-      console.log('Initializing auth with user:', storedUser);
+      //console.log('Initializing auth with token:', storedToken);
+     // console.log('Initializing auth with user:', storedUser);
 
       if (storedToken && !isTokenExpired(storedToken) && storedUser) {
         setToken(storedToken);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (credentials: LoginCredentials) => {
   try {
-    console.log('🔑 Attempting login with:', credentials.email);
+    console.log('🔑 Attempting login with:', credentials.username);
     const response = await apiService.login(credentials);
     console.log('✅ Login response:', response);
     
@@ -65,9 +65,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log('🚀 Forcing redirect to dashboard...');
     
     // Use timeout to ensure state is saved before redirect
-    router.push('/session-view')
+
+    //router.push('/session-view')
+
     // setTimeout(() => {
-    //   window.location.href = '/dashboard';
+      window.location.href = '/session-view';
     // }, 100);
     
   } catch (error) {
@@ -102,6 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
   const logout = () => {
+    console.log('🚪 Logging out user...');
     setToken(null);
     setUser(null);
     removeTokenFromStorage();

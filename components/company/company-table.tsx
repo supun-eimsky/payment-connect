@@ -64,7 +64,7 @@ const renderCell = (row: Company, columnKey: string, onEdit: any, onDelete: any,
                         <img src="/icons/view_icon.svg"></img>
                     </Button>
                     
-                    <div >
+                    {/* <div >
                          <Button
                         variant="ghost"
                         size="icon"
@@ -73,7 +73,7 @@ const renderCell = (row: Company, columnKey: string, onEdit: any, onDelete: any,
                     >
                          <img src="/icons/trash.svg"></img>
                     </Button>
-                    </div>
+                    </div> */}
                    
                 </div>
             );

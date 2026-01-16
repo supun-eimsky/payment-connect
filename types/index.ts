@@ -68,7 +68,7 @@ export interface TicketDetails {
 }
 
 export interface LoginCredentials {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -175,6 +175,8 @@ export interface TripFilters {
   started_at_from?: string;
   started_at_to?: string;
   limit?: number;
+  organisation_id?: string | null;
+  offset?: number | null;
 
 }
 

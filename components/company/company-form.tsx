@@ -15,7 +15,13 @@ import {
 
 import { Company, CompanyFormProps } from '@/types/company';
 
-
+////set Organisation_ID
+const userStr = localStorage.getItem("user")
+let Organisation_ID: any = null;
+if (userStr) {
+    const parsed = JSON.parse(userStr);
+    Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
+}
 
 
 const YEARS = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
@@ -121,8 +127,7 @@ export default function CompanyForm({
                 <Label htmlFor="company_id" className="block text-gray-700 font-medium mb-2">Organisation Id</Label>
                 <Input id="company_id" value={organisation_id ? (organisation_id) : ("")} disabled className="bg-gray-100" />
               </div> */}
-
-              <div className="space-y-2">
+          {organisation_id ==null?(<div className="space-y-2">
                 <Label className="block text-gray-700 font-medium mb-2">
                   Organisation*
                 </Label>
@@ -141,7 +146,8 @@ export default function CompanyForm({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div>):('')}
+              
 
               <div className="space-y-2">
                 <Label className="block text-gray-700 font-medium mb-2">Name *</Label>

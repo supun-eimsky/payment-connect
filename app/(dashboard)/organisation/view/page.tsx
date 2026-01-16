@@ -190,7 +190,7 @@ const OrganisationDetailsView: React.FC = () => {
             const busesArray = data || [];
             setBusesList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Bus Details Data:', busesArray);
+          //  console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -212,7 +212,7 @@ const OrganisationDetailsView: React.FC = () => {
             setavailableUsers(busesArray.data)
             //  setBusesList(busesArray.data);
             //  pagination.setTotal(busesArray.total);
-            console.log('User Details Data:', busesArray);
+          //  console.log('User Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -253,7 +253,7 @@ const OrganisationDetailsView: React.FC = () => {
         }
     }
     const fetchDevices = async (filterData: any) => {
-        console.log(filterData, "filterDatafilterDatafilterData")
+      //  console.log(filterData, "filterDatafilterDatafilterData")
         if (!token) return;
         try {
 
@@ -264,7 +264,7 @@ const OrganisationDetailsView: React.FC = () => {
             setAssignments(busesArray.data)
             // setBusesList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Company Device data', busesArray);
+          //  console.log('Company Device data', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -278,7 +278,7 @@ const OrganisationDetailsView: React.FC = () => {
             const data = await apiService.getBusRouteassignments(token, id);
             // setAssignments(data.route_assignments)
             setCrewAssignments(data.crew_assignments)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+          //  console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
 
         } catch (err) {
             console.error('Failed to fetch bus', err);
@@ -323,12 +323,12 @@ const OrganisationDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit assignment:", editForm);
+     //   console.log("Edit assignment:", editForm);
         if (!token) return;
         try {
             const data = await apiService.updateRouteAssignment(token, editForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+          //  console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -341,9 +341,9 @@ const OrganisationDetailsView: React.FC = () => {
     };
 
     const handleAssignCompany = async () => {
-        console.log(assignForm)
+       // console.log(assignForm)
         const selectedRoute = devices.find(r => r.id === assignForm.company_id);
-        console.log(selectedRoute, "sssssssssssssdlklk")
+       // console.log(selectedRoute, "sssssssssssssdlklk")
         if (!selectedRoute) return;
 
         const newAssignment: companyAssignment = {
@@ -365,7 +365,7 @@ const OrganisationDetailsView: React.FC = () => {
             setAssignments([...assignments, newAssignment]);
         }
 
-        console.log("Assign route:", assignForm);
+       // console.log("Assign route:", assignForm);
         const setNewAssignForm: any = {
             company_id: id,
             assignment_reason: assignForm.assignment_reason
@@ -374,7 +374,7 @@ const OrganisationDetailsView: React.FC = () => {
         try {
             const data = await apiService.DeviceAssignmentToCompany(token, assignForm.company_id ?? "", setNewAssignForm);
             //setBusData(data)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+           // console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
             fetchDevices(filters)
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -426,12 +426,12 @@ const OrganisationDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit crew assignment:", editCrewForm);
+       // console.log("Edit crew assignment:", editCrewForm);
         if (!token) return;
         try {
             const data = await apiService.updateCrewAssignment(token, editCrewForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+           // console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -443,12 +443,12 @@ const OrganisationDetailsView: React.FC = () => {
     };
 
     const handleAssignCrew = async () => {
-        console.log()
+       // console.log()
         const selectedBus = busesList.find(u => u.id === assignCrewForm.bus_id);
-        console.log(selectedBus)
+       // console.log(selectedBus)
         if (!selectedBus) return;
 
-        console.log(selectedBus)
+        //console.log(selectedBus)
 
         const createFormData: any = {
             bus_id: selectedBus.id
@@ -465,7 +465,7 @@ const OrganisationDetailsView: React.FC = () => {
         } finally {
 
         }
-        console.log(createFormData)
+       // console.log(createFormData)
 
 
         fetchBusAllAssimnet(id ?? "")

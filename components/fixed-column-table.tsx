@@ -12,7 +12,7 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Settings2, Filter, SlidersHorizontal, Armchair, CheckCircle, Clock, XCircle } from "lucide-react"
+import { Settings2, Filter, SlidersHorizontal, Armchair, CheckCircle, Clock, XCircle , List, ChevronDown} from "lucide-react"
 import {
     Card,
     CardAction,
@@ -98,14 +98,30 @@ const COLUMNS = [
 ]
 const STATUS_OPTIONS = ["issued", "cancelled"]
 
-
+const userStr = localStorage.getItem("user")
+let Organisation_ID: any = null;
+let COMPANY_ID: any = null;
+let role: any = null;
+if (userStr) {
+  const parsed = JSON.parse(userStr);
+  Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
+  COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+  role = parsed.user_type ? (parsed.user_type) : (null)
+}
 
 export function FixedColumnTable({
     data: initialData,
+    companyList: companies,
+    onSelecteCompny,
+    selectedCompy,
 }: {
     data: TableData[]
+    companyList?: any
+    selectedCompy?: string | null
+    onSelecteCompny: (companyId: string) => void
 }) {
     const [data] = useState<TableData[]>(initialData)
+    const [selecteCompanyId, setSelecteCompanyId] = useState<string>('');
     const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
         COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {}),
     )
@@ -113,7 +129,7 @@ export function FixedColumnTable({
         STATUS_OPTIONS.reduce((acc, status) => ({ ...acc, [status]: true }), {}),
     )
     const TICKET_TYPE_OPTIONS = Array.from(new Set(data.map((item) => item.ticket_type)))
-    console.log(TICKET_TYPE_OPTIONS, "Password123Password123Password123Password123")
+    //console.log(TICKET_TYPE_OPTIONS, "Password123Password123Password123Password123")
     const [selectedTicketTypes, setSelectedTicketTypes] = useState<Record<string, boolean>>(
         TICKET_TYPE_OPTIONS.reduce((acc, type) => ({ ...acc, [type]: true }), {}),
     )
@@ -181,9 +197,9 @@ export function FixedColumnTable({
                 return row.session_id
             case "ticket_number":
                 return row.ticket_number
-            case "boarding_stop_id": 
+            case "boarding_stop_id":
                 return row.boarding_stop_id
-            case "card_number": 
+            case "card_number":
                 return row.card_payment_details?.card_number || "N/A"
             case "alighting_stop_id":
                 return row.alighting_stop_id
@@ -253,13 +269,40 @@ export function FixedColumnTable({
         }
     }
     const filteredData = data.filter((row) => selectedStatuses[row.status] && selectedTicketTypes[row.ticket_type])
+     const handleChange = (value: string | number) => {
+        setSelecteCompanyId(String(value));
+        onSelecteCompny(String(value));
+
+    };
     return (
         <Card className="@container/card">
             <CardHeader>
                 <CardTitle className="text-[22px]">Issued Tickets</CardTitle>
 
                 <CardAction>
+                    
                     <div className="flex items-center gap-2">
+                      {role==="organisation_admin" ?( <><div className="w-full min-w-32 text-[15px] font-semibold"  >
+                            Selected Company:
+                        </div>
+                        <div className="relative w-full" >
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10">
+                                <List className="w-4 h-4" />
+                            </div>
+                            <select
+                                value={selectedCompy || ""}
+                                onChange={(e) => handleChange(e.target.value)}
+                                className="text-[13px] w-full h-11 pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                            >
+
+                                {companies?.map((item: any, index:any) => (
+                                    <option key={item.id} value={item.id} > {item.name}</option>
+                                ))}
+
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                        </div></> ):null}
+                        
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="lg" className="gap-2 bg-transparent rounded-[14px]">
@@ -281,8 +324,8 @@ export function FixedColumnTable({
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                        
-                       
+
+
                         {/* <Button
                             className="
                                         flex items-center gap-2 

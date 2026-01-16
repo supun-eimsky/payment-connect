@@ -188,7 +188,7 @@ const CompanyDetailsView: React.FC = () => {
             const busesArray = data || [];
             setBusesList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Bus Details Data:', busesArray);
+           // console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -210,7 +210,7 @@ const CompanyDetailsView: React.FC = () => {
             setavailableUsers(busesArray.data)
             //  setBusesList(busesArray.data);
             //  pagination.setTotal(busesArray.total);
-            console.log('User Details Data:', busesArray);
+           // console.log('User Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -236,11 +236,13 @@ const CompanyDetailsView: React.FC = () => {
 
     }
     const fetchCompanyGetById = async (id: string) => {
+        console.log(id, "Company IDssssssssssssssssssss")
         if (!token) return;
         try {
             const data = await apiService.getCompanyById(token, id);
             setCompanyData(data)
             filters.company_id = id
+
             fetchDevices(filters)
 
 
@@ -251,7 +253,8 @@ const CompanyDetailsView: React.FC = () => {
         }
     }
     const fetchDevices = async (filterData: any) => {
-        console.log(filterData, "filterDatafilterDatafilterData")
+         filters.company_id = id
+       console.log(filterData, "filterDatafilterDatafilterData")
         if (!token) return;
         try {
 
@@ -262,7 +265,7 @@ const CompanyDetailsView: React.FC = () => {
             setAssignments(busesArray.data)
             // setBusesList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Company Device data', busesArray);
+           // console.log('Company Device data', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -276,7 +279,7 @@ const CompanyDetailsView: React.FC = () => {
             const data = await apiService.getBusRouteassignments(token, id);
             // setAssignments(data.route_assignments)
             setCrewAssignments(data.crew_assignments)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+           // console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
 
         } catch (err) {
             console.error('Failed to fetch bus', err);
@@ -326,7 +329,7 @@ const CompanyDetailsView: React.FC = () => {
         try {
             const data = await apiService.updateRouteAssignment(token, editForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+          //  console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -339,9 +342,9 @@ const CompanyDetailsView: React.FC = () => {
     };
 
     const handleAssignCompany = async () => {
-        console.log(assignForm)
+       // console.log(assignForm)
         const selectedRoute = devices.find(r => r.id === assignForm.company_id);
-        console.log(selectedRoute, "sssssssssssssdlklk")
+       // console.log(selectedRoute, "sssssssssssssdlklk")
         if (!selectedRoute) return;
 
         const newAssignment: companyAssignment = {
@@ -363,7 +366,7 @@ const CompanyDetailsView: React.FC = () => {
             setAssignments([...assignments, newAssignment]);
         }
 
-        console.log("Assign route:", assignForm);
+       // console.log("Assign route:", assignForm);
         const setNewAssignForm: any = {
             company_id: id,
             assignment_reason: assignForm.assignment_reason
@@ -372,7 +375,7 @@ const CompanyDetailsView: React.FC = () => {
         try {
             const data = await apiService.DeviceAssignmentToCompany(token, assignForm.company_id ?? "", setNewAssignForm);
             //setBusData(data)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+          //  console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
             fetchDevices(filters)
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -424,12 +427,12 @@ const CompanyDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit crew assignment:", editCrewForm);
+      //  console.log("Edit crew assignment:", editCrewForm);
         if (!token) return;
         try {
             const data = await apiService.updateCrewAssignment(token, editCrewForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+          //  console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -443,10 +446,10 @@ const CompanyDetailsView: React.FC = () => {
     const handleAssignCrew = async () => {
         console.log()
         const selectedBus = busesList.find(u => u.id === assignCrewForm.bus_id);
-        console.log(selectedBus)
+       // console.log(selectedBus)
         if (!selectedBus) return;
 
-        console.log(selectedBus)
+       // console.log(selectedBus)
 
         const createFormData: any = {
             bus_id: selectedBus.id
@@ -463,7 +466,7 @@ const CompanyDetailsView: React.FC = () => {
         } finally {
 
         }
-        console.log(createFormData)
+      //  console.log(createFormData)
 
 
         fetchBusAllAssimnet(id ?? "")
@@ -662,12 +665,12 @@ const CompanyDetailsView: React.FC = () => {
                                                                     onValueChange={(value) => setAssignForm({ ...assignForm, company_id: value })}
                                                                 >
                                                                     <SelectTrigger id="route" className='w-full'>
-                                                                        <SelectValue placeholder="Select a route" />
+                                                                        <SelectValue placeholder="Select a Devices" />
                                                                     </SelectTrigger>
                                                                     <SelectContent>
                                                                         {devices.map((route) => (
                                                                             <SelectItem key={route.id} value={route.id}>
-                                                                                {route.device_code} - {route.model}
+                                                                                {route.device_code} - ({route.serial_number} )
                                                                             </SelectItem>
                                                                         ))}
                                                                     </SelectContent>

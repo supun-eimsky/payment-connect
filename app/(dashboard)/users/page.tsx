@@ -41,10 +41,12 @@ import { FilterField, FilterValues, DynamicFilterProps } from '@/types';
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
     COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    role = parsed.user_type ? (parsed.user_type) : (null)
 }
 
 
@@ -165,7 +167,7 @@ export default function UserManagement() {
                 "organisation_id": Organisation_ID
             })
             pagination.setTotal(busesArray.total);
-            console.log('User Details Data:', busesArray);
+            //  console.log('User Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -181,9 +183,12 @@ export default function UserManagement() {
             setLoading(true)
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const companiesArray = data || [];
-            setCompanies(companiesArray.data)
+            if (role != "company_admin") {
+                setCompanies(companiesArray.data)
+            }
+
             //  setcompanies(busesArray.data);
-            console.log('Company Details Data:', companiesArray);
+            //   console.log('Company Details Data:', companiesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -218,10 +223,10 @@ export default function UserManagement() {
         filters.offset = pagination.offset
 
         fetchUsers(filters);
-        console.log('Filters applied:', filters);
+        // console.log('Filters applied:', filters);
     }, [pagination.currentPage]);
     const handleEdit = (bus: User) => {
-        console.log(bus)
+        // console.log(bus)
         setEditingUser(bus);
         setShowForm(true);
     };
@@ -240,7 +245,7 @@ export default function UserManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteBus(token, deleteDialog.busId);
-                console.log(createRespone)
+                // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchUsers(filters)
@@ -263,7 +268,7 @@ export default function UserManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateUser(token, data);
-                console.log(createRespone)
+                //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchUsers(filters)
@@ -281,9 +286,9 @@ export default function UserManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+                /// console.log(data)
                 const createRespone = await apiService.createUser(token, data);
-                console.log(createRespone)
+                // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchUsers(filters)
@@ -298,26 +303,31 @@ export default function UserManagement() {
 
     };
     const handleFilterPopup = async () => {
-        console.log("ssssss")
+        //console.log("ssssss")
         setIsFilterOpen(true)
     }
     const handleFilterSubmit = (filterData: any) => {
-        console.log('Received filters:', filterData);
+        //  console.log('Received filters:', filterData);
 
 
     };
     const handleFilterValuesRest = async (data: FilterValues) => {
-        console.log(data)
+        // console.log(data)
 
         location.reload()
 
     }
 
     const handleFilterValues = async (data: FilterValues) => {
-        console.log(data)
+        // console.log(data)
         const merged = { ...filters, ...data };
-        setFilters(merged)
-        fetchUsers(merged);
+
+
+
+        const { organisation_id, ...output } = merged;
+        console.log(output)
+        setFilters(output)
+        fetchUsers(output);
 
     }
     return (

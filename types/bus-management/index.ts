@@ -16,17 +16,21 @@ export interface Bus {
     is_retired: boolean;
     is_decommissioned: boolean;
     total_capacity: number;
+     category_id:string;
     age: number;
     device: any;
 }
 
         export interface BusTableProps {
             buses: Bus[];
+            setRole:any;
             onAdd: () => void;
             onEdit: (bus: Bus) => void;
             onDelete: (id: string) => void;
             onView: (id: string) => void;
             onfilter:()=>void;
+            onSelecteCompny: (id: string) => void;
+            companyList:any[]|null; 
         }
 
 export interface BusFormData {
@@ -39,12 +43,14 @@ export interface BusFormData {
     year_of_manufacture: number;
     seating_capacity: number;
     standing_capacity: number;
+    category_id:string;
 }
 
 export interface BusFormProps {
     companyId: string;
     onfilter:any;
     companyList:any[]|null;
+    categories:any[]|null;
     initialData?: BusFormData | null;
     onSubmit: (data: BusFormData) => void;
     onCancel: () => void;

@@ -132,8 +132,8 @@ export default function RoutePermitForm({
                   </SelectTrigger>
                   <SelectContent>
                     {routList.map((cap) => (
-                      <SelectItem key={cap.id} value={cap.name.toString()}>
-                        {cap.name}
+                      <SelectItem key={cap.id} value={cap.id}>
+                        {cap.name}  ( {cap.code})
                       </SelectItem>
                     ))}
                   </SelectContent>

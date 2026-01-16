@@ -14,6 +14,7 @@ export interface UserFilters {
 export interface User {
     user_type?: string,
     email?: string,
+    username?: string,
     phone?: string,
     password?: string,
     first_name?: string,

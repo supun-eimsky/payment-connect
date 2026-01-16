@@ -33,10 +33,12 @@ import { Card } from '@/components/ui/card';
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
     COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    role = parsed.user_type ? (parsed.user_type) : (null)
 }
 
 
@@ -54,13 +56,16 @@ export default function BusManagement() {
     const router = useRouter();
     const [companies, setcompanies] = useState<Company[]>([]);
     const [selectedItem, setSelectedItem] = useState(null)
+    const [categories, setCategories] = useState<any[]>([]);
+
+    const [selectedCompany, setSelectedCompany] = useState("")
     const [companyFilters, setCompanyFilters] = useState<any>({
         organisation_id: Organisation_ID,
 
     });
     const [filters, setFilters] = useState<BusFilters>({
         company_id: COMPANY_ID,
-
+        organisation_id: Organisation_ID,
     });
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; busId: string | null }>({
         open: false,
@@ -84,14 +89,14 @@ export default function BusManagement() {
             label: 'Min Year',
             type: 'select',
             options: yearsList,
-             icon: <Clock className="w-4 h-4" />,
+            icon: <Clock className="w-4 h-4" />,
         },
         {
             key: 'max_year',
             label: 'Max Year',
             type: 'select',
             options: yearsList,
-             icon: <Clock className="w-4 h-4" />,
+            icon: <Clock className="w-4 h-4" />,
         },
 
         {
@@ -130,7 +135,7 @@ export default function BusManagement() {
 
 
     ];
-   
+
 
     const fetchCompanies = async (filterData: any) => {
         if (!token) return;
@@ -141,7 +146,12 @@ export default function BusManagement() {
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setcompanies(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+              if (role != "system") {
+                 filters.company_id = busesArray.data.length > 0 ? (busesArray.data[0].id) : ('');
+              }
+           
+            fetchBuses(filters)
+            //console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -150,7 +160,19 @@ export default function BusManagement() {
         }
 
     }
-  
+    const fetchRouteCategories = async () => {
+        if (!token) return;
+        try {
+            const data = await apiService.getRouteCategories(token);
+           // console.log('Route Categories:', data);
+            setCategories(data.categories)
+        } catch (err) {
+            console.error('fetchRouteCategories', err);
+        } finally {
+            // setLoading(false);
+        }
+    }
+
     const fetchBuses = async (filterData: any) => {
         if (!token) return;
         try {
@@ -161,7 +183,7 @@ export default function BusManagement() {
             const busesArray = data || [];
             setBuses(busesArray.data);
             pagination.setTotal(busesArray.total);
-            console.log('Bus Details Data:', busesArray);
+           // console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -174,10 +196,22 @@ export default function BusManagement() {
         setYearsList(getYearList(1980, 2025))
         filters.limit = pagination.limit
         filters.offset = pagination.offset
-        fetchBuses(filters)
-        if (!COMPANY_ID) {
+       // console.log("role fdjkdjgkd;jgkldjgkj", role)
+        fetchRouteCategories()
+        if (role == "system") {
+            fetchBuses(filters)
             fetchCompanies(companyFilters)
+        } else {
+            if (Organisation_ID != null) {
+
+            } else {
+                fetchBuses(filters)
+            }
+            if (!COMPANY_ID) {
+                fetchCompanies(companyFilters)
+            }
         }
+
     }, [pagination.currentPage]);
     const handleAdd = () => {
         setEditingBus(null);
@@ -185,7 +219,7 @@ export default function BusManagement() {
     };
 
     const handleEdit = (bus: Bus) => {
-        console.log(bus)
+        //console.log(bus)
         setEditingBus(bus);
         setShowForm(true);
     };
@@ -194,7 +228,7 @@ export default function BusManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+        //console.log(bus)
         router.push('/bus-management/view?id=' + bus.id)
         // setSelectedItem(bus);
     };
@@ -205,7 +239,7 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteBus(token, deleteDialog.busId);
-                console.log(createRespone)
+             //   console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchBuses(filters)
@@ -222,7 +256,7 @@ export default function BusManagement() {
         setDeleteDialog({ open: false, busId: null });
     };
     const handleFilterPopup = async () => {
-        console.log("ssssss")
+       // console.log("ssssss")
         setIsFilterOpen(true)
     }
 
@@ -232,7 +266,7 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateBus(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchBuses(filters)
@@ -240,7 +274,7 @@ export default function BusManagement() {
 
 
             } catch (err: any) {
-                console.log(err.message);
+              //  console.log(err.message);
                 setError(err.message);
             } finally {
 
@@ -250,9 +284,9 @@ export default function BusManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+              //  console.log(data)
                 const createRespone = await apiService.createBus(token, data);
-                console.log(createRespone)
+               // console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchBuses(filters)
@@ -267,18 +301,23 @@ export default function BusManagement() {
 
     };
     const handleFilterValuesRest = async (data: FilterValues) => {
-        console.log(data)
+      //  console.log(data)
 
         location.reload()
 
     }
 
     const handleFilterValues = async (data: FilterValues) => {
-        console.log(data)
+      //  console.log(data)
         const merged = { ...filters, ...data };
         setFilters(merged)
         fetchBuses(merged);
 
+    }
+    const handleSelecteCompny = async (companyId: string) => {
+       // console.log(companyId)
+        filters.company_id = companyId
+        fetchBuses(filters);
     }
 
     return (
@@ -298,6 +337,7 @@ export default function BusManagement() {
                         <BusForm
                             companyId={COMPANY_ID}
                             companyList={companies.length > 0 ? (companies) : (null)}
+                            categories={categories}
                             onfilter={handleFilterPopup}
                             initialData={editingBus ? {
                                 registration_number: editingBus.registration_number,
@@ -308,6 +348,7 @@ export default function BusManagement() {
                                 seating_capacity: editingBus.seating_capacity,
                                 standing_capacity: editingBus.standing_capacity,
                                 company_id: editingBus.company_id,
+                                category_id: editingBus.category_id,
                                 id: editingBus.id,
                             } : null}
                             onSubmit={handleFormSubmit}
@@ -327,7 +368,7 @@ export default function BusManagement() {
                         </div>
                             <div className="px-1 lg:px-3">
                                 <Card className='py-[15px]'>
-                                    <BusTable onfilter={handleFilterPopup} buses={buses} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} onView={handleItemView} />
+                                    <BusTable setRole={role} onfilter={handleFilterPopup} companyList={companies.length > 0 ? (companies) : (null)} buses={buses} onAdd={handleAdd} onEdit={handleEdit} onDelete={handleDelete} onView={handleItemView} onSelecteCompny={handleSelecteCompny} />
 
                                     <DataPagination
                                         currentPage={pagination.currentPage}

@@ -51,7 +51,7 @@ export default function CompanyManagement() {
     const [filters, setFilters] = useState<CompanyFilters>({
         organisation_id: Organisation_ID,
         offset: 0,
-        limit: 10,
+        limit: 100,
 
     });
     const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; busId: string | null }>({
@@ -63,10 +63,13 @@ export default function CompanyManagement() {
         setNavbarData('Company Management', 'Company Management / Company List');
 
         fetchCompanies(filters)
-        fetchOrganisations({
+        if(Organisation_ID==null){
+             fetchOrganisations({
             limit: 100
 
         })
+        }
+       
     }, []);
 
     const fetchOrganisations = async (filterData: any) => {
@@ -78,7 +81,7 @@ export default function CompanyManagement() {
             const data = await apiService.getOrganisationsWithFilters(token, null, filterData);
             const busesArray = data || [];
             setOrganisations(busesArray.data);
-            console.log('Organisations Details Data:', busesArray.data);
+          //  console.log('Organisations Details Data:', busesArray.data);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -97,7 +100,7 @@ export default function CompanyManagement() {
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setcompanies(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+           // console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -112,7 +115,7 @@ export default function CompanyManagement() {
     };
 
     const handleEdit = (bus: Company) => {
-        console.log(bus)
+       // console.log(bus)
         setEditingBus(bus);
         setShowForm(true);
     };
@@ -121,7 +124,7 @@ export default function CompanyManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+       // console.log(bus)
         router.push('/company/view?id=' + bus.id)
         // setSelectedItem(bus);
     };
@@ -132,7 +135,7 @@ export default function CompanyManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteCompany(token, deleteDialog.busId);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchCompanies(filters)
@@ -155,7 +158,7 @@ export default function CompanyManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateCompany(token, data);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchCompanies(filters)
@@ -173,9 +176,9 @@ export default function CompanyManagement() {
             if (!token) return;
             try {
                 setError("");
-                console.log(data)
+              //  console.log(data)
                 const createRespone = await apiService.createCompany(token, data);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchCompanies(filters)

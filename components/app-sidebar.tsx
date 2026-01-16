@@ -87,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { title: "User Management", url: "/users", icon: RiUserLine, visibility: true },
       { title: "Bus Management", url: "/bus-management", icon: RiBusLine, visibility: true },
       { title: "Permits Management", url: "/route-permits", icon: IconLicense, visibility: true },
-      { title: "Bus Stop Management", url: "/bus-stop", icon: IconBusStop, visibility: true },
+      { title: "Bus Stop Management", url: "/bus-stop", icon: IconBusStop, visibility:  Organisation_ID || COMPANY_ID ? false : true },
       { title: "Route Management", url: "/route", icon: TbRouteSquare, visibility: true },
       { title: "Company Management", url: "/company", icon: PiBuildingOffice, visibility: COMPANY_ID ? false : true },
       { title: "Devices  Management", url: "/devices", icon: MdOnDeviceTraining, visibility: true },

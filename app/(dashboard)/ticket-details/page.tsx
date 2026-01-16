@@ -16,13 +16,16 @@ import { FilterField, FilterValues, DynamicFilterProps } from '@/types';
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
   const parsed = JSON.parse(userStr);
   Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
   COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+  role = parsed.user_type ? (parsed.user_type) : (null)
 }
 export default function DashboardPage() {
   const [allTickets, setAllTickets] = useState<AllTicket[] | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [previousCursor, setPreviousCursor] = useState<string | null>(null);
@@ -37,7 +40,7 @@ export default function DashboardPage() {
   const [filters, setFilters] = useState<any>({
     company_id: COMPANY_ID,
     organisation_id: Organisation_ID,
-    limt: 40
+    limt: 10
   });
   let filterFieldsPageHeader: FilterField[] = [
 
@@ -84,7 +87,7 @@ export default function DashboardPage() {
       ],
     },
   ];
-  if (!COMPANY_ID) {
+  if (!COMPANY_ID && role !== "organisation_admin") {
     const new_add: FilterField = {
       key: 'company_id',
       label: 'Company',
@@ -92,12 +95,17 @@ export default function DashboardPage() {
       options: companies,
     };
     filterFieldsPageHeader = [new_add, ...filterFieldsPageHeader];
-    console.log("Fetching all routes", filterFieldsPageHeader)
+    // console.log("Fetching all routes", filterFieldsPageHeader)
   }
 
   useEffect(() => {
     setNavbarData("Issued Tickets", "Issued Tickets / Tickets");
-    fetchStats(filters, null);
+    if (role === "organisation_admin") {
+
+    } else {
+      fetchStats(filters, null);
+    }
+    //fetchStats(filters, null);
     fetchCompanies({
       "organisation_id": Organisation_ID,
       limit: 100
@@ -112,7 +120,8 @@ export default function DashboardPage() {
 
 
       fetchRoute({
-        limit: 100
+        limit: 100,
+        organisation_id: Organisation_ID
       })
     }
   }, [token, setNavbarData]);
@@ -127,7 +136,7 @@ export default function DashboardPage() {
       setHasMore(data.has_more);
       setNextCursor(data.next_cursor ?? null);
       setPreviousCursor(data.previous_cursor ?? null);
-      console.log('Ticket Details Data:', data);
+      // console.log('Ticket Details Data:', data);
     } catch (err) {
       console.error('Failed to fetch stats', err);
     } finally {
@@ -144,9 +153,14 @@ export default function DashboardPage() {
       const data = await apiService.getCompaniesWithFilters(token, null, filterData);
       const companiesArray = data || [];
       setCompanies(companiesArray.data)
+      if (role === "organisation_admin") {
+        console.log("Fetching all routes for organisation admin", companies)
+        filters.company_id = companiesArray.data && companiesArray.data.length > 0 ? companiesArray.data[0].id : "";
+        fetchStats(filters, null);
+      }
 
       //  setcompanies(busesArray.data);
-      console.log('Company Details Data:', companiesArray);
+      //console.log('Company Details Data:', companiesArray);
     } catch (err: any) {
       console.error('Company to fetch bus', err);
       // setError(err.message);
@@ -163,10 +177,10 @@ export default function DashboardPage() {
       //    setLoading(true)
       const data = await apiService.getRouteWithFilters(token, null, filterData);
       const busesArray = data.routes;
-      console.log('Route  d:', busesArray);
+      // console.log('Route  d:', busesArray);
       setRouteList(busesArray)
       return
-      console.log('Route  dsssssss:', busesArray);
+      //  console.log('Route  dsssssss:', busesArray);
     } catch (err) {
       console.error('Route  d', err);
     } finally {
@@ -184,7 +198,7 @@ export default function DashboardPage() {
       const busesArray = data.routes;
       setRouteList(busesArray)
       return
-      console.log('Route  dsssssss:', busesArray);
+      // console.log('Route  dsssssss:', busesArray);
     } catch (err) {
       console.error('Route  d', err);
     } finally {
@@ -200,7 +214,7 @@ export default function DashboardPage() {
   // }, [token]);
   // Handle next page
   const handleNext = () => {
-    console.log('Next cursor:', nextCursor);
+    // console.log('Next cursor:', nextCursor);
     if (hasMore && nextCursor) {
       fetchStats(filters, nextCursor);
     }
@@ -216,21 +230,21 @@ export default function DashboardPage() {
 
 
   const handleFilterValuesRest = async (data: FilterValues) => {
-    console.log(data)
+    //  console.log(data)
 
     location.reload()
 
   }
 
   const handleFilterValues = async (data: FilterValues) => {
-    console.log(data)
+    //console.log(data)
     const merged = { ...filters, ...data };
     setFilters(merged);
     fetchStats(merged, null);
 
   }
   const OnChangeFilterValues = async (data: any) => {
-    console.log(data)
+    //console.log(data)
     if (data.company_id) {
       getRouteCompany({
         "company_id": data.company_id,
@@ -239,6 +253,13 @@ export default function DashboardPage() {
     }
 
 
+  }
+  const setSelectedCompanyId = async (data: any) => {
+    console.log("Selected Company ID:", data);
+    setSelectedCompany(data)
+    const merged = { ...filters, company_id: data };
+    setFilters(merged);
+    fetchStats(merged, null);
   }
 
 
@@ -263,7 +284,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="px-1 lg:px-3">
-              {allTickets && allTickets.length > 0 && !loading ? (<FixedColumnTable data={allTickets} />) : (<></>)}
+              {allTickets && !loading ? (<FixedColumnTable data={allTickets} companyList={companies} selectedCompy={selectedCompany} onSelecteCompny={setSelectedCompanyId} />) : (<></>)}
             </div>
             <div className="flex justify-end gap-2 px-1 lg:px-3 pb-4">
               <div className="mt-6 flex items-center justify-between">

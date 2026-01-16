@@ -22,6 +22,7 @@ const COLUMNS = [
     // { key: "company", label: "company_id", defaultVisible: true },
     // { key: "fleet_number", label: "Fleet Number", defaultVisible: true },
     { key: "user_type", label: "User type", defaultVisible: true,test_align:"" },
+    { key: "username", label: "Username", defaultVisible: true,test_align:"" },
     { key: "email", label: "Email", defaultVisible: true },
     { key: "status", label: "Status", defaultVisible: true },
 
@@ -41,6 +42,8 @@ const renderCell = (row: User, columnKey: string, onEdit: any, onDelete: any, on
             return row.company_id
         case "user_type":
             return row.user_type
+        case "username":
+            return row.username
         case "email":
             return row.email
         case "phone":
@@ -66,7 +69,7 @@ const renderCell = (row: User, columnKey: string, onEdit: any, onDelete: any, on
                         <img src="/icons/view_icon.svg"></img>
                     </Button>
                     
-                    <div >
+                    {/* <div >
                          <Button
                         variant="ghost"
                         size="icon"
@@ -75,7 +78,7 @@ const renderCell = (row: User, columnKey: string, onEdit: any, onDelete: any, on
                     >
                          <img src="/icons/trash.svg"></img>
                     </Button>
-                    </div>
+                    </div> */}
                    
                 </div>
             );

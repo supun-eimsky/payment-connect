@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge"
 
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, Settings2,SlidersHorizontal,EyeIcon } from 'lucide-react';
+
+import { Plus, Pencil, Trash2, Settings2, SlidersHorizontal, EyeIcon, List, ChevronDown } from 'lucide-react';
 import { Bus, BusTableProps } from '@/types/bus-management';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
@@ -24,15 +25,15 @@ const COLUMNS = [
     { key: "manufacturer", label: "Manufacturer", defaultVisible: true },
 
     { key: "year_of_manufacture", label: "Year of Manufacture", defaultVisible: true },
-     { key: "status", label: "Status", defaultVisible: true },
+    { key: "status", label: "Status", defaultVisible: true },
     { key: "seating_capacity", label: "Seating Capacity", defaultVisible: true },
     { key: "standing_capacity", label: "Standing Capacity", defaultVisible: true },
-   
+
     { key: "action", label: "Action", defaultVisible: true }
 
 
 ]
-const renderCell = (row: Bus, columnKey: string, onEdit: any, onDelete: any, onView:any) => {
+const renderCell = (row: Bus, columnKey: string, onEdit: any, onDelete: any, onView: any) => {
     switch (columnKey) {
         case "registration_number":
             return row.registration_number
@@ -49,29 +50,29 @@ const renderCell = (row: Bus, columnKey: string, onEdit: any, onDelete: any, onV
         case "standing_capacity":
             return row.standing_capacity
         case "status":
-            return   <Badge className="bg-[#E6F6E9] text-[#16A34A] capitalize">{row.status}</Badge>
+            return <Badge className="bg-[#E6F6E9] text-[#16A34A] capitalize">{row.status}</Badge>
         case "action":
             return (
                 <div className="flex justify-start gap-3">
-                  
-                    <Button  className="bg-[#F28603] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onEdit(row)}>
+
+                    <Button className="bg-[#F28603] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onEdit(row)}>
                         <img src="/icons/Edit.svg"></img>
                     </Button>
                     <Button className="bg-[#F5C300EB] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => onView(row)}>
                         <img src="/icons/view_icon.svg"></img>
                     </Button>
-                    
-                    <div >
-                         <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDelete(row.id)}
-                        className="bg-[#FF0000] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800 "
-                    >
-                         <img src="/icons/trash.svg"></img>
-                    </Button>
-                    </div>
-                   
+
+                    {/* <div >
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onDelete(row.id)}
+                            className="bg-[#FF0000] rounded-[49px] w-[33px] h-[33px] hover:text-red-700 hover:bg-red-800 "
+                        >
+                            <img src="/icons/trash.svg"></img>
+                        </Button>
+                    </div> */}
+
                 </div>
             );
 
@@ -79,7 +80,9 @@ const renderCell = (row: Bus, columnKey: string, onEdit: any, onDelete: any, onV
             return ""
     }
 }
-export default function BusTable({ buses, onAdd, onEdit, onDelete,onView,onfilter }: BusTableProps) {
+export default function BusTable({ buses, onAdd, onEdit, onDelete, onView, onfilter, companyList, onSelecteCompny,setRole }: BusTableProps) {
+    const [selecteCompanyId, setSelecteCompanyId] = useState<string>('');
+
     const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(
         COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: col.defaultVisible }), {}),
     )
@@ -90,37 +93,63 @@ export default function BusTable({ buses, onAdd, onEdit, onDelete,onView,onfilte
             [columnKey]: !prev[columnKey],
         }))
     }
+    const handleChange = (value: string | number) => {
+        setSelecteCompanyId(String(value));
+        onSelecteCompny(String(value));
+
+    };
     return (
-    
-           <>
-                <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-lg">Bus List</CardTitle>
-                        <CardAction>
-                            <div className="flex items-center gap-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline"  size="lg" className="h-11 gap-2 bg-transparent rounded-[14px]">
-                                            <Settings2 className="h-4 w-4" />
-                                            Customize Columns
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-56">
-                                        <DropdownMenuLabel>Show/Hide Columns</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        {COLUMNS.map((column) => (
-                                            <DropdownMenuCheckboxItem
-                                                key={column.key}
-                                                checked={visibleColumns[column.key]}
-                                                onCheckedChange={() => toggleColumn(column.key)}
-                                            >
-                                                {column.label}
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                                 <Button
-                                    className="
+
+        <>
+            <CardHeader>
+                <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg">Bus List</CardTitle>
+                    <CardAction>
+                        <div className="flex items-center gap-2">
+                                 {setRole==="organisation_admin" ?( <><div className="w-full min-w-32 text-[15px] font-semibold"  >
+                            Selected Company:
+                        </div>
+                        <div className="relative w-full" >
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10">
+                                    <List className="w-4 h-4" />
+                                </div>
+                                <select
+                                    value={selecteCompanyId}
+                                    onChange={(e) => handleChange(e.target.value)}
+                                    className="text-[13px] w-full h-11 pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none bg-white"
+                                >
+
+                                    {companyList?.map((item, index) => (
+                                        <option key={item.id} value={item.id} > {item.name}</option>
+                                    ))}
+
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            </div></>):('')}
+                            
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="lg" className="h-11 gap-2 bg-transparent rounded-[14px]">
+                                        <Settings2 className="h-4 w-4" />
+                                        Customize Columns
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuLabel>Show/Hide Columns</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {COLUMNS.map((column) => (
+                                        <DropdownMenuCheckboxItem
+                                            key={column.key}
+                                            checked={visibleColumns[column.key]}
+                                            onCheckedChange={() => toggleColumn(column.key)}
+                                        >
+                                            {column.label}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            <Button
+                                className="
                                     h-11
                                         flex items-center gap-2 
                                         text-white font-medium
@@ -130,73 +159,73 @@ export default function BusTable({ buses, onAdd, onEdit, onDelete,onView,onfilte
                                         hover:opacity-90
                                         shadow-md
                                     "
-                                      onClick={onfilter}
-                                >
-                                    <SlidersHorizontal className="w-4 h-4" />
-                                    Filters
-                                </Button>
-                                <Button
-                                    onClick={onAdd}
-                                    
-                                    className="flex h-11 items-center gap-2 text-white font-medium rounded-[14px] px-5 py-2 bg-gradient-to-r from-[#0F90EE] to-[#276CCC] hover:opacity-90 shadow-md"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Add Bus
-                                </Button>
-                               
-                            </div>
-                        </CardAction>
-                    </div>
-                </CardHeader>
-                <CardContent className="px-0">
-                    {buses.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500">
-                            No buses added yet. Click "Add New Bus" to get started.
+                                onClick={onfilter}
+                            >
+                                <SlidersHorizontal className="w-4 h-4" />
+                                Filters
+                            </Button>
+                            <Button
+                                onClick={onAdd}
+
+                                className="flex h-11 items-center gap-2 text-white font-medium rounded-[14px] px-5 py-2 bg-gradient-to-r from-[#0F90EE] to-[#276CCC] hover:opacity-90 shadow-md"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Add Bus
+                            </Button>
+
                         </div>
-                    ) : (
-                        <div className="w-full  border bg-white dark:bg-slate-950">
-                            <div className="overflow-x-auto">
-                                <Table>
-                                    <TableHeader className="bg-muted sticky top-0 z-10">
-                                        <TableRow>
+                    </CardAction>
+                </div>
+            </CardHeader>
+            <CardContent className="px-0">
+                {buses.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                        No buses added yet. Click "Add New Bus" to get started.
+                    </div>
+                ) : (
+                    <div className="w-full  border bg-white dark:bg-slate-950">
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader className="bg-muted sticky top-0 z-10">
+                                    <TableRow>
+                                        {/* Fixed Column */}
+
+                                        {COLUMNS.map(
+                                            (column) =>
+                                                visibleColumns[column.key] && (
+                                                    <TableHead key={column.key} className="min-w-32 text-[15px] font-semibold">
+                                                        {column.label}
+                                                    </TableHead>
+                                                ),
+                                        )}
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {buses.map((row) => (
+                                        <TableRow key={row.id} className="hover:bg-muted/50">
                                             {/* Fixed Column */}
 
                                             {COLUMNS.map(
                                                 (column) =>
                                                     visibleColumns[column.key] && (
-                                                        <TableHead key={column.key} className="min-w-32 text-[15px] font-semibold">
-                                                            {column.label}
-                                                        </TableHead>
+                                                        <TableCell key={column.key} className="min-w-32 text-[15px] font-normal text-[#71747D]">
+                                                            {renderCell(row, column.key, onEdit, onDelete, onView)}
+                                                        </TableCell>
+
                                                     ),
+
                                             )}
+
                                         </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {buses.map((row) => (
-                                            <TableRow key={row.id} className="hover:bg-muted/50">
-                                                {/* Fixed Column */}
+                                    ))}
+                                </TableBody>
+                            </Table>
 
-                                                {COLUMNS.map(
-                                                    (column) =>
-                                                        visibleColumns[column.key] && (
-                                                            <TableCell key={column.key} className="min-w-32 text-[15px] font-normal text-[#71747D]">
-                                                                {renderCell(row, column.key, onEdit, onDelete,onView)}
-                                                            </TableCell>
-
-                                                        ),
-
-                                                )}
-
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-
-                            </div>
                         </div>
-                    )}
-                </CardContent>
-           
-     </>
+                    </div>
+                )}
+            </CardContent>
+
+        </>
     );
 }

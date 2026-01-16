@@ -91,10 +91,12 @@ interface CrewAssignment {
 const userStr = localStorage.getItem("user")
 let Organisation_ID: any = null;
 let COMPANY_ID: any = null;
+let role: any = null;
 if (userStr) {
     const parsed = JSON.parse(userStr);
     Organisation_ID = parsed.organisation_id ? (parsed.organisation_id) : (null);
-    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null)
+    COMPANY_ID = parsed.company_id ? (parsed.company_id) : (null);
+    role = parsed.user_type ? (parsed.user_type) : (null);
 }
 
 const DeviceDetailsView: React.FC = () => {
@@ -181,7 +183,7 @@ const DeviceDetailsView: React.FC = () => {
             const busesArray = data || [];
             setBusesList(busesArray.data);
             // pagination.setTotal(busesArray.total);
-            console.log('Bus Details Data:', busesArray);
+            //  console.log('Bus Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -203,7 +205,7 @@ const DeviceDetailsView: React.FC = () => {
             setavailableUsers(busesArray.data)
             //  setBusesList(busesArray.data);
             //  pagination.setTotal(busesArray.total);
-            console.log('User Details Data:', busesArray);
+            //  console.log('User Details Data:', busesArray);
         } catch (err) {
             console.error('Failed to fetch bus', err);
         } finally {
@@ -220,7 +222,7 @@ const DeviceDetailsView: React.FC = () => {
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setcompanies(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+            //  console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             //  setError(err.message);
@@ -234,10 +236,10 @@ const DeviceDetailsView: React.FC = () => {
         try {
             const data = await apiService.DevicesGetById(token, id);
             setDevicesData(data)
-            if(data.company){setAssignments([data.company])}
-            if(data.bus){ setCrewAssignments([data.bus])}
-            
-           
+            if (data.company) { setAssignments([data.company]) }
+            if (data.bus) { setCrewAssignments([data.bus]) }
+
+
 
 
         } catch (err) {
@@ -252,7 +254,7 @@ const DeviceDetailsView: React.FC = () => {
             const data = await apiService.getBusRouteassignments(token, id);
             // setAssignments(data.route_assignments)
             setCrewAssignments(data.crew_assignments)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+            //  console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
 
         } catch (err) {
             console.error('Failed to fetch bus', err);
@@ -295,12 +297,12 @@ const DeviceDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit assignment:", editForm);
+        //   console.log("Edit assignment:", editForm);
         if (!token) return;
         try {
             const data = await apiService.updateRouteAssignment(token, editForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+            // console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -313,9 +315,9 @@ const DeviceDetailsView: React.FC = () => {
     };
 
     const handleAssignCompany = async () => {
-        console.log(assignForm)
+        //  console.log(assignForm)
         const selectedRoute = companies.find(r => r.id === assignForm.company_id);
-        console.log(selectedRoute, "sssssssssssssdlklk")
+        //  console.log(selectedRoute, "sssssssssssssdlklk")
         if (!selectedRoute) return;
 
         const newAssignment: companyAssignment = {
@@ -334,12 +336,12 @@ const DeviceDetailsView: React.FC = () => {
             setAssignments([...assignments, newAssignment]);
         }
 
-        console.log("Assign route:", assignForm);
+        //  console.log("Assign route:", assignForm);
         if (!token) return;
         try {
             const data = await apiService.DeviceAssignmentToCompany(token, id ?? "", assignForm);
             //setBusData(data)
-            console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
+            //    console.log(data, "sTyTyTytytYtYtyTyTYtYtYTY")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -389,12 +391,12 @@ const DeviceDetailsView: React.FC = () => {
 
 
 
-        console.log("Edit crew assignment:", editCrewForm);
+        //   console.log("Edit crew assignment:", editCrewForm);
         if (!token) return;
         try {
             const data = await apiService.updateCrewAssignment(token, editCrewForm);
             //setBusData(data)
-            console.log(data, "updateRouteAssignment")
+            //  console.log(data, "updateRouteAssignment")
             fetchBusAllAssimnet(id ?? "")
         } catch (err: any) {
             console.error('Failed to fetch bus', err);
@@ -406,12 +408,12 @@ const DeviceDetailsView: React.FC = () => {
     };
 
     const handleAssignCrew = async () => {
-        console.log()
+        //  console.log()
         const selectedBus = busesList.find(u => u.id === assignCrewForm.bus_id);
-        console.log(selectedBus)
+        //  console.log(selectedBus)
         if (!selectedBus) return;
 
-        console.log(selectedBus)
+        // console.log(selectedBus)
 
         const createFormData: any = {
             bus_id: selectedBus.id
@@ -428,7 +430,7 @@ const DeviceDetailsView: React.FC = () => {
         } finally {
 
         }
-        console.log(createFormData)
+        // console.log(createFormData)
 
 
         fetchBusAllAssimnet(id ?? "")
@@ -605,8 +607,7 @@ const DeviceDetailsView: React.FC = () => {
                                 <div className="grid grid-cols gap-1  @xl/main:grid-cols-2 @5xl/main:grid-cols-1">
 
 
-
-                                    <Card>
+                                    {role != "company_admin" ? (<><Card>
                                         {errorRouteAssing && (
                                             <Alert variant="destructive" className="border-red-500">
                                                 <AlertCircle className="h-4 w-4" />
@@ -745,18 +746,18 @@ const DeviceDetailsView: React.FC = () => {
                                                                     <Button className="bg-[#F28603] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => openEditDialog(assignment)}>
                                                                         <img src="/icons/Edit.svg"></img>
                                                                     </Button>
-                                                                    <Button
+                                                                    {/* <Button
                                                                         variant="ghost"
                                                                         size="icon"
                                                                           onClick={() => handleRemoveAssignment(assignment.id)}
                                                                         className="bg-[#FF0000] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800 "
                                                                     >
                                                                         <img src="/icons/trash.svg"></img>
-                                                                    </Button>
+                                                                    </Button> */}
 
 
                                                                 </div>
-                                                                
+
                                                                 <Badge className={getStatusBadge('active')}>
                                                                     "Active"
                                                                 </Badge>
@@ -772,7 +773,8 @@ const DeviceDetailsView: React.FC = () => {
                                                 </div>
                                             )}
                                         </CardContent>
-                                    </Card>
+                                    </Card></>) : null}
+
                                     <Card>
                                         {errorCrewAssing && (
                                             <Alert variant="destructive" className="border-red-500">
@@ -785,9 +787,9 @@ const DeviceDetailsView: React.FC = () => {
                                         <CardHeader>
 
                                             <CardTitle className="flex items-center gap-2">
-                                                 <img src="/icons/bus_infor.svg" />
-                                            <span className='text-[20px] font-semibold'>  Bus Assignments</span>
-                                              
+                                                <img src="/icons/bus_infor.svg" />
+                                                <span className='text-[20px] font-semibold'>  Bus Assignments</span>
+
                                             </CardTitle>
                                             <CardAction>
                                                 <Dialog open={isAssignCrewOpen} onOpenChange={setIsAssignCrewOpen}>
@@ -857,7 +859,7 @@ const DeviceDetailsView: React.FC = () => {
                                                         >
                                                             <div className="space-y-3 flex-1">
                                                                 <div className="flex items-start justify-between">
-                                                                     <div>
+                                                                    <div>
                                                                         <div className="flex items-center gap-2">
                                                                             <Label className="text-sm font-medium text-gray-500">Bus Number</Label>
 
@@ -866,7 +868,7 @@ const DeviceDetailsView: React.FC = () => {
                                                                             {assignment?.registration_number ?? "138"}
                                                                         </p>
                                                                     </div>
-                                                                    
+
                                                                 </div>
 
                                                             </div>
@@ -877,24 +879,24 @@ const DeviceDetailsView: React.FC = () => {
                                                                     <Button className="bg-[#F28603] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800" variant="ghost" size="icon" onClick={() => openEditCrewDialog(assignment)}>
                                                                         <img src="/icons/Edit.svg"></img>
                                                                     </Button>
-                                                                    <Button
+                                                                    {/* <Button
                                                                         variant="ghost"
                                                                         size="icon"
                                                                           onClick={() => handleRemoveCrewAssignment(assignment.id)}
                                                                         className="bg-[#FF0000] rounded-[49px] w-[28px] h-[28px] hover:text-red-700 hover:bg-red-800 "
                                                                     >
                                                                         <img src="/icons/trash.svg"></img>
-                                                                    </Button>
+                                                                    </Button> */}
 
 
                                                                 </div>
-                                                                
+
                                                                 <Badge className={getStatusBadge('active')}>
                                                                     "Active"
                                                                 </Badge>
                                                             </div>
-                                                          
-                                                            
+
+
                                                         </div>
                                                     ))}
                                                 </div>

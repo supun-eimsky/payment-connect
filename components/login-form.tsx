@@ -27,7 +27,7 @@ export function LoginForm() {
         try {
             console.log('🔑 Submitting login...');
             if (isLogin) {
-                await login({ email: email, password: password });
+                await login({ username: email, password: password });
             } else {
                 //await signup({ name: formData.name, email: formData.email, password: formData.password });
             }
@@ -44,11 +44,11 @@ export function LoginForm() {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-                <Label className="text-sm" htmlFor="email">Email</Label>
+                <Label className="text-sm" htmlFor="email">Username</Label>
                 <Input
                     id="email"
-                    type="email"
-                    placeholder="name@example.com"
+                    type="text"
+                    placeholder="Username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required

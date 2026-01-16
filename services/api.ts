@@ -92,6 +92,7 @@ class ApiService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       console.log('🔑 Logging in with API...');
+      console.log(credentials)
 
       // Real API call
       const response = await apiClient.post<AuthResponse>(
@@ -248,39 +249,18 @@ class ApiService {
   }
   async getBusStopWithFilters(
     token: string,
+    cursor?: string | null,
     filters?: BusStopFilters
   ): Promise<any> {
 
     // Real API call:
     // Build query parameters
-    const params: Record<string, string | number | boolean> = {};
-
-  
-    if (filters) {
-      if (filters.status) {
-        params.status = filters.status;
-      }
-      if (filters.search) {
-        params.search = filters.search;
-      }
-      if (filters.stop_code) {
-        params.stop_code = filters.stop_code;
-      }
-      if (filters.stop_name_en) {
-        params.stop_name_en = filters.stop_name_en;
-      }
-
-      if (filters.offset) {
-        params.offset = filters.offset;
-      }
-
-
-      if (filters.limit) {
-        params.limit = filters.limit;
-      }
-
-
-    }
+      const params: Record<string, string | number | boolean> = {
+      ...(cursor && { cursor }),
+      ...filters && Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== undefined && value !== null)
+      )
+    };
 
     const response = await apiClient.get<any>(
       API_ENDPOINTS.busStop.BUS_STOPS,
@@ -736,7 +716,19 @@ class ApiService {
       API_ENDPOINTS.route.GET_ROUTES_COMPANY(companyId),
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "Bus ROUTES_CATEGORIES");
+    //console.log(response, "Bus ROUTES_CATEGORIES");
+    return response.data;
+
+
+  }
+  async getRouteOrganisation(token: string, organisationId: string): Promise<any> {
+
+    const response = await apiClient.get<any>(
+
+      API_ENDPOINTS.route.GET_ROUTES_ORGANISATION(organisationId),
+      { token, service: 'fare' } // Explicitly specify service
+    );
+    //console.log(response, "Bus ROUTES_CATEGORIES");
     return response.data;
 
 
@@ -749,7 +741,7 @@ class ApiService {
       API_ENDPOINTS.route.ROUTES_CATEGORIES,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "Bus ROUTES_CATEGORIES");
+   // console.log(response, "Bus ROUTES_CATEGORIES");
     return response.data;
 
 
@@ -761,7 +753,7 @@ class ApiService {
       API_ENDPOINTS.bus.BUS_ALL_ASSIGNMENTS(id),
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "Bus BUS_ROUTE_ASSIGNMENTS");
+  //  console.log(response, "Bus BUS_ROUTE_ASSIGNMENTS");
     return response.data;
 
 
@@ -774,7 +766,7 @@ class ApiService {
       formData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ROUTE_ASSIGNMENTS");
+  //  console.log(response, "ROUTE_ASSIGNMENTS");
     return response.data;
   }
   async busCrewAssignments(token: string, formData: CreateCrewAssignment): Promise<any> {
@@ -785,7 +777,7 @@ class ApiService {
       formData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ROUTE_ASSIGNMENTS");
+ //   console.log(response, "ROUTE_ASSIGNMENTS");
     return response.data;
   }
   async updateCrewAssignment(token: string, formData: any): Promise<any> {
@@ -796,7 +788,7 @@ class ApiService {
       formData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ROUTE_ASSIGNMENTS");
+  //  console.log(response, "ROUTE_ASSIGNMENTS");
     return response.data;
   }
 
@@ -808,7 +800,7 @@ class ApiService {
       formData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ROUTE_ASSIGNMENTS");
+   // console.log(response, "ROUTE_ASSIGNMENTS");
     return response.data;
   }
 
@@ -818,7 +810,7 @@ class ApiService {
       busFormData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+   // console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -830,7 +822,7 @@ class ApiService {
       busFormData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response);
+    //console.log(response);
     return response;
 
 
@@ -842,7 +834,7 @@ class ApiService {
       API_ENDPOINTS.bus.DELETE_BUS(id),
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response);
+    //console.log(response);
     return response;
 
 
@@ -854,9 +846,22 @@ class ApiService {
       busStopFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+    //console.log(response, "ioioioioioioi");
 
     return response;
+  }
+  async updateBusStop(token: string, busStopFormData: BusStopFormData): Promise<any> {
+    const setdata = busStopFormData;
+    const response = await apiClient.put<any>(
+
+      API_ENDPOINTS.busStop.UPDATE_BUS_STOP(setdata.id),
+      busStopFormData,
+      { token, service: 'fare' } // Explicitly specify service
+    );
+    //console.log(response);
+    return response;
+
+
   }
   async getRoutePermitsWithFilters(
     token: string,
@@ -902,7 +907,7 @@ class ApiService {
       { token, params, service: 'ticketing' }
     );
     // console.log(response)
-    console.log(response, "sssssssssssyuyuyuyuyuyuyuyuy")
+  //  console.log(response, "sssssssssssyuyuyuyuyuyuyuyuy")
     return response.data;
   }
 
@@ -912,7 +917,7 @@ class ApiService {
       permitFormData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+  //  console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -924,7 +929,7 @@ class ApiService {
       permitFormData,
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response);
+   // console.log(response);
     return response;
 
 
@@ -936,7 +941,7 @@ class ApiService {
       API_ENDPOINTS.permits.DELETE_ROUTE_PERMITS(id),
       { token, service: 'ticketing' } // Explicitly specify service
     );
-    console.log(response);
+   // console.log(response);
     return response;
 
 
@@ -947,7 +952,7 @@ class ApiService {
       permitFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+  //  console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -957,7 +962,7 @@ class ApiService {
       permitFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+  //  console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -969,7 +974,7 @@ class ApiService {
       API_ENDPOINTS.route.ROUTE_BY_ID(id),
       { token, params, service: 'fare', } // Explicitly specify service
     );
-    console.log(response, "getRouteById Deails");
+ //   console.log(response, "getRouteById Deails");
     return response.data;
 
 
@@ -993,7 +998,7 @@ class ApiService {
       API_ENDPOINTS.route.ROUTES,
       { token, params, service: 'fare' }
     );
-    console.log(response, "Route list")
+   // console.log(response, "Route list")
     const response2 = {
 
       data: {
@@ -1026,7 +1031,7 @@ class ApiService {
       permitFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+   // console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -1036,7 +1041,7 @@ class ApiService {
       permitFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+   // console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -1046,7 +1051,18 @@ class ApiService {
       permitFormData,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+  //  console.log(response, "ioioioioioioi");
+
+    return response;
+  }
+  async updatedirection(token: string, permitFormData: DirectionsFormData): Promise<any> {
+       console.log("ioioioioioioi");
+    const response = await apiClient.put<any>(
+      API_ENDPOINTS.directions.UPDATE_DIRECTIONS(permitFormData.id),
+      permitFormData,
+      { token, service: 'fare' } // Explicitly specify service
+    );
+  //  console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -1058,7 +1074,7 @@ class ApiService {
       API_ENDPOINTS.route.FARES_TO_BUS_STOP(directionId, stopId),
       { token, service: 'fare' }
     );
-    console.log(response)
+   // console.log(response)
     return response.data
   }
   async createDirectionStops(token: string, dataSet: any): Promise<any> {
@@ -1067,7 +1083,7 @@ class ApiService {
       dataSet,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+    //console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -1077,7 +1093,7 @@ class ApiService {
       dataSet,
       { token, service: 'fare' } // Explicitly specify service
     );
-    console.log(response, "ioioioioioioi");
+    //console.log(response, "ioioioioioioi");
 
     return response;
   }
@@ -1089,7 +1105,7 @@ class ApiService {
       API_ENDPOINTS.route.GET_ROUTE_FLL(id),
       { token, service: 'fare' }
     );
-    console.log(response, "opopopopopopopopopopopopopop")
+    //console.log(response, "opopopopopopopopopopopopopop")
     const dataSet = {
       "data": {
         "route": {

@@ -37,6 +37,7 @@ export default function UserForm({
   const [formData, setFormData] = useState<User>({
     user_type: '',
     email: '',
+    username: '',
     phone: '',
     password: '',
     first_name: '',
@@ -59,22 +60,18 @@ export default function UserForm({
     {
       lable: "System",
       value: "system",
-      visible:  Organisation_ID || COMPANY_ID ? false : true
+      visible: Organisation_ID || COMPANY_ID ? false : true
     },
     {
       lable: "Organisation Admin",
       value: "organisation_admin",
-      visible:  COMPANY_ID ? false : true
+      visible: COMPANY_ID ? false : true
     },
-    {
-      lable: "Company Owner",
-      value: "company_owner",
-       visible:  true
-    },
+
     {
       lable: "Company Admin",
       value: "company_admin",
-       visible:  true
+      visible: true
     },
     {
       lable: "Driver",
@@ -176,6 +173,9 @@ export default function UserForm({
     if (field === 'email') {
       validateEmailRealtime(value as string);
     }
+    if (field === 'username') {
+      validateUsernameRealtime(value as string);
+    }
 
     if (field === 'password') {
       validatePasswordRealtime(value as string);
@@ -189,7 +189,17 @@ export default function UserForm({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
+  const validateUsernameRealtime = (username: string) => {
+    if (!username.trim()) {
+      setErrors(prev => ({ ...prev, username: 'Username is required' }));
+    } else if (username.length < 3 || username.length > 50) {
+      setErrors(prev => ({ ...prev, username: 'Username must be between 3-50 characters' }));
+    } else if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+      setErrors(prev => ({ ...prev, username: 'Username can only contain letters, numbers, dots, underscores, and hyphens' }));
+    } else {
+      setErrors(prev => ({ ...prev, username: '' }));
+    }
+  };
   const validateEmailRealtime = (email: string) => {
     if (!email.trim()) {
       setErrors(prev => ({ ...prev, email: 'Email is required' }));
@@ -262,11 +272,16 @@ export default function UserForm({
       } else if (formData.password !== confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
       }
-     
+
       if (!(formData.user_type || '').trim()) {
         newErrors.user_type = 'User type is required';
       }
 
+    }
+    if (selectUserType == "organisation_admin" || selectUserType == "company_admin") {
+      if (!(formData.username || "").trim()) {
+        newErrors.username = 'Username is required';
+      }
     }
 
     if (!(formData.first_name || "").trim()) {
@@ -382,7 +397,7 @@ export default function UserForm({
                   <p className="text-red-500 text-sm">{errors.organisation_id}</p>
                 )}
               </div>) : ('')}
-              {!initialData && (selectUserType == "company_admin" || selectUserType == "company_owner"|| selectUserType == "driver" || selectUserType == "conductor") ? (<div className="space-y-2">
+              {!initialData && (selectUserType == "company_admin" || selectUserType == "company_owner" || selectUserType == "driver" || selectUserType == "conductor") ? (<div className="space-y-2">
                 <Label className="block text-gray-700 font-medium mb-2">
                   Company ID *
                 </Label>
@@ -408,7 +423,19 @@ export default function UserForm({
                 )}
               </div>) : ('')}
 
-
+              {!initialData && (selectUserType == "organisation_admin" || selectUserType == "company_admin") ? (<div className="space-y-2">
+                <Label className="block text-gray-700 font-medium mb-2">
+                  UserName *
+                </Label>
+                <Input
+                  placeholder="Enter UserName"
+                  value={formData.username}
+                  onChange={(e) => handleChange('username', e.target.value)}
+                />
+                {errors.username && (
+                  <p className="text-red-500 text-sm">{errors.username}</p>
+                )}
+              </div>) : null}
 
 
               <div className="space-y-2">

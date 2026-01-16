@@ -78,14 +78,14 @@ export default function DevicesManagement() {
 
             const data = await apiService.getDevicesWithFilters(token, cursor, filtersData);
             const busesArray = data.data;
-            console.log(busesArray, "device data ffffff")
+          //  console.log(busesArray, "device data ffffff")
             setDevices(busesArray.data)
             setHasMore(busesArray.has_more);
             setNextCursor(busesArray.next_cursor ?? null);
             setPreviousCursor(busesArray.previous_cursor ?? null);
             // setAvailableRoutes(busesArray)
             //  setRoutePermits(busesArray);
-            console.log('Route  dsssssss:', busesArray);
+          //  console.log('Route  dsssssss:', busesArray);
         } catch (err) {
             console.error('Route  d', err);
         } finally {
@@ -102,7 +102,7 @@ export default function DevicesManagement() {
             const data = await apiService.getCompaniesWithFilters(token, null, filterData);
             const busesArray = data || [];
             setcompanies(busesArray.data);
-            console.log('Company Details Data:', busesArray);
+          //  console.log('Company Details Data:', busesArray);
         } catch (err: any) {
             console.error('Company to fetch bus', err);
             setError(err.message);
@@ -121,7 +121,7 @@ export default function DevicesManagement() {
             const data = await apiService.getOrganisationsWithFilters(token, null, filterData);
             const busesArray = data || [];
             setOrganisations(busesArray.data);
-            console.log('Organisation Details Data:', busesArray);
+          //  console.log('Organisation Details Data:', busesArray);
         } catch (err: any) {
             console.error('Organisation to fetch bus', err);
            // setError(err.message);
@@ -167,7 +167,7 @@ export default function DevicesManagement() {
     };
 
     const handleEdit = (bus: Devices) => {
-        console.log(bus)
+       // console.log(bus)
 
 
         setEditingRoutePermit(bus);
@@ -178,7 +178,7 @@ export default function DevicesManagement() {
         setDeleteDialog({ open: true, busId: id });
     };
     const handleItemView = (bus: any) => {
-        console.log(bus)
+       // console.log(bus)
 
         router.push('/devices/view?id=' + bus.id)
     };
@@ -189,7 +189,7 @@ export default function DevicesManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.deleteRoutePermit(token, deleteDialog.busId);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchRoutePermits(filters)
@@ -207,7 +207,7 @@ export default function DevicesManagement() {
 
     const handleCompanySlect = async (data: any) => {
         filters.company_id = data
-        console.log(data)
+      //  console.log(data)
         //   fetchRoute(filters)
     }
     const asdignToOrganisation = async (data: any) => {
@@ -222,7 +222,7 @@ export default function DevicesManagement() {
             if (!token) return;
             try {
                 const createRespone = await apiService.updateDevicesOrganisation(token, data);
-                console.log(createRespone)
+              //  console.log(createRespone)
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchDevices(filters)
@@ -230,7 +230,7 @@ export default function DevicesManagement() {
 
 
             } catch (err: any) {
-                console.log(err.message);
+               // console.log(err.message);
                 setError(err.message);
             } finally {
 
@@ -245,7 +245,7 @@ export default function DevicesManagement() {
                 }
 
                 const createRespone = await apiService.createDevicesOrganisation(token, Organisation_ID, data);
-                console.log(createRespone, "sss")
+               // console.log(createRespone, "sss")
                 if (createRespone.success) {
                     setShowForm(false);
                     fetchDevices(filters)
@@ -260,7 +260,7 @@ export default function DevicesManagement() {
 
     };
     const handleNext = () => {
-        console.log('Next cursor:', nextCursor);
+       // console.log('Next cursor:', nextCursor);
         if (hasMore && nextCursor) {
             fetchDevices(filters, nextCursor);
         }

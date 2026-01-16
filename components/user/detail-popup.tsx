@@ -69,6 +69,10 @@ export function DetailPopup({ item, onClose }: any) {
                   <p className="text-sm font-medium text-muted-foreground">Full Name</p>
                   <p className="text-foreground font-medium mt-1">{item.full_name}</p>
                 </div>
+                 <div>
+                  <p className="text-sm font-medium text-muted-foreground">Username</p>
+                  <p className="text-foreground font-medium mt-1">{item.username}</p>
+                </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Email</p>
                   <p className="text-foreground font-medium mt-1">{item.email}</p>
